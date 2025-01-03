@@ -103,7 +103,7 @@ return [
             'port' => env('DB_PORT', '1433'),
             'database' => env('DB_DATABASE', 'DB_PKNOW_PRG5'),
             'username' => env('DB_USERNAME', 'sa'),
-            'password' => env('DB_PASSWORD', 'aangaang'),
+            'password' => env('DB_PASSWORD', '12345678'),
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,

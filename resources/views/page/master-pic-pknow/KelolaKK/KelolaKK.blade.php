@@ -61,6 +61,7 @@
 <script>
 
 var data = @json($data);
+//ayam bakar md,fhwehj
         const container = document.getElementById('dataContainer');
         container.innerHTML = '';
         console.log("data kk", data);

@@ -152,41 +152,5 @@
     }
 </script>
 
-<script>
-const form = document.querySelector('#formId');
-form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-
-    const formData = new FormData(form);
-
-    try {
-        const response = await fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            },
-        });
-
-        // Debug respons sebelum diparse
-        const responseText = await response.text();
-        console.log("Raw Response:", responseText);
-
-        // Coba parse ke JSON
-        const result = JSON.parse(responseText);
-
-        if (result.success) {
-            window.location.href = result.redirectUrl;
-        } else {
-            alert(result.message);
-        }
-    } catch (error) {
-        console.error('Error parsing JSON:', error);
-        alert('Terjadi kesalahan saat menyimpan data.');
-    }
-});
-
-    </script>
-
 
 @include('backbone.footer')
