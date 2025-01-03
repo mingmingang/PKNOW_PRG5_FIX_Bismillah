@@ -108,6 +108,8 @@
 
 
 <script>
+
+    //ayam bebek
     $(document).ready(function () {
         // Ketika dropdown Program Studi berubah
         $('#programStudi').on('change', function () {
