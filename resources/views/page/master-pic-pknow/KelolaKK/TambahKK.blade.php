@@ -106,10 +106,43 @@
     console.log("List roles:", roles);
 </script>
 
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const role = urlParams.get('role');
+    const pengguna = urlParams.get('pengguna');
+
+    const usrId = "{{ Cookie::get('usr_id') }}";
+    console.log('usr_id dari cookie:', usrId);
+    
+    console.log('Role:', role);
+    console.log('Pengguna:', pengguna);
+
+    function resetForm() {
+        const form = document.querySelector('form');
+
+        form.reset();
+
+        const gambarPreview = document.getElementById('gambarPreview');
+        gambarPreview.src = '{{ asset('assets/NoImage.png') }}';
+        const personInChargeSelect = document.getElementById('personInCharge');
+        personInChargeSelect.innerHTML = '<option value="">Pilih PIC</option>';
+
+        console.log("Form telah direset.");
+    }
+
+    function previewImage(event) {
+        const input = event.target;
+        const reader = new FileReader();
+        reader.onload = function () {
+            document.getElementById('gambarPreview').src = reader.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+
+</script>
+
 
 <script>
-
-    //ayam bebek
     $(document).ready(function () {
         // Ketika dropdown Program Studi berubah
         $('#programStudi').on('change', function () {

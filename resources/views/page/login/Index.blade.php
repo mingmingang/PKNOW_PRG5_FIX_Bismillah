@@ -74,39 +74,43 @@
 @include('backbone.footer')
 
 <script>
- @if(session('roles') && session('showRoleSelectionModal'))
-    const roles = @json(session('roles'));
-    if (roles && roles.length > 0) {
-        let roleList = document.getElementById('roleList');
-        roles.forEach(role => {
-            const listItem = document.createElement('li');
-            listItem.classList.add('list-group-item');
-            listItem.innerHTML = `Masuk sebagai ${role.name}`;
-            listItem.addEventListener('click', function() {
-                // Redirect to role-specific dashboard
-                window.location.href = `/dashboard/${role.name}?role=${encodeURIComponent(role.name)}&pengguna=${encodeURIComponent(role.pengguna)}`;
+    document.addEventListener('DOMContentLoaded', function () {
+        const usrId = "{{ Cookie::get('usr_id') }}";
+        console.log('usr_id dari cookie:', usrId);
+
+        @if(session('roles') && session('showRoleSelectionModal'))
+        const roles = @json(session('roles'));
+        if (roles && roles.length > 0) {
+            let roleList = document.getElementById('roleList');
+            roles.forEach(role => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('list-group-item');
+                listItem.innerHTML = `Masuk sebagai ${role.name}`;
+                listItem.addEventListener('click', function() {
+                    // window.location.href = `/dashboard/${role.name}?role=${encodeURIComponent(role.name)}&pengguna=${encodeURIComponent(role.pengguna)}`;
+                    window.location.href = `/dashboard/${role.name}`;
+                });
+                roleList.appendChild(listItem);
             });
-            roleList.appendChild(listItem);
-        });
 
-        // Show modal
-        jQuery('#roleModal').modal('show');
+            jQuery('#roleModal').modal('show');
 
-        // Clear session after modal is shown
-        jQuery('#roleModal').on('shown.bs.modal', function () {
-            fetch("{{ route('clearRoleSession') }}", {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json'
-                }
-            }).then(response => response.json())
-              .then(data => console.log("Session cleared:", data))
-              .catch(error => console.error("Error clearing session:", error));
-        });
-    }
-@endif
+            jQuery('#roleModal').on('shown.bs.modal', function () {
+                fetch("{{ route('clearRoleSession') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => response.json())
+                  .then(data => console.log("Session cleared:", data))
+                  .catch(error => console.error("Error clearing session:", error));
+            });
+        }
+        @endif
+    });
 </script>
+
 
 
 

@@ -20,7 +20,7 @@
     <ul class="menu-center">
       <li class="menu-item active">
         <a href="#beranda" class="menu-link">
-          <div class="menu-item">
+          <div class="menu-item" onclick="handleBeranda()">
             <span>Beranda</span>
           </div>
         </a>
@@ -145,6 +145,12 @@
   document.querySelector('.profile-dropdown').style.display = 'block';
 }
 
+function handleBeranda() {
+  const role = "{{ Cookie::get('role') }}";
+        window.location.href = `/dashboard/${role}`;
+}
+
+
 function hideDropdown() {
   document.querySelector('.profile-dropdown').style.display = 'none';
 }
@@ -176,20 +182,19 @@ function getCurrentDateTime() {
 document.getElementById('last-login').textContent = getCurrentDateTime();
 
 window.onload = function() {
-    // Get 'role' parameter from the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const role = urlParams.get('role');
-    const name = urlParams.get('pengguna');
+    const usrId = "{{ Cookie::get('usr_id') }}";
+    console.log('usr_id dari cookie:', usrId);
+    const role = "{{ Cookie::get('role') }}";
+    console.log('role dari cookie:', role);
+    const pengguna = "{{ Cookie::get('pengguna') }}";
+    console.log('pengguna dari cookie:', pengguna);
     
-    if (role) {
+   
         document.getElementById('role-title').textContent = `${role}`;
-        document.getElementById('role-nama').textContent = `${name}`;
+        document.getElementById('role-nama').textContent = `${pengguna}`;
         console.log("Role yang dipilih: " + role);
         // Lakukan apa pun dengan data role di sini
-    } else {
-        console.log("Role tidak ditemukan di URL.");
-    }
+   
 };
-
 </script>
 </html>

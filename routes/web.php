@@ -28,7 +28,6 @@ Route::get('/dashboard/PIC P-KNOW', function () {
 });
 
 
-
 Route::get('/beranda_utama', function () {
     return view('Backbone.BerandaUtama');
 })->name('beranda_utama');

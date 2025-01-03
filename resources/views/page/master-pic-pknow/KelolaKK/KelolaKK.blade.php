@@ -77,6 +77,7 @@ var data = @json($data);
                                 <h5 class="card-title">${item['Nama Kelompok Keahlian']}</h5>
                                 <p class="card-text">${item.Deskripsi}</p>
                                 <p class="card-text"><strong>Status:</strong> ${item.Status}</p>
+                                <button class="btn btn-primary me-2" onclick="editData('${item.Key}')">Edit</button>
                                <button class="btn btn-danger" onclick="deleteData('${item.Key}')">Hapus</button>
                             </div>
                         </div>
@@ -100,7 +101,20 @@ var data = @json($data);
             }
             window.location.href = `/kelola_kk/${role}/tambah?role=${encodeURIComponent(role)}&pengguna=${encodeURIComponent(name)}`;
         }
-    </script>
+
+        function editData(id) {
+            console.log("Navigating to edit page for ID:", id);
+            const urlParams = new URLSearchParams(window.location.search);
+            const role = urlParams.get('role');
+            const name = urlParams.get('pengguna');
+            if (!role || !name) {
+                console.error('Role or pengguna parameter missing');
+                return;
+            }
+            window.location.href = `/kelola_kk/${role}/edit/${id}?role=${encodeURIComponent(role)}&pengguna=${encodeURIComponent(name)}`;
+        }
+
+</script>
 
 
 <script>
@@ -208,5 +222,11 @@ async function fetchData(params = {}) {
         }
     }
     </script>
+
+@if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
 
 @include('backbone.footer')

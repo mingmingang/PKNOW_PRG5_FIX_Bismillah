@@ -41,6 +41,21 @@ class HeaderController extends Controller
         return view('header', compact('userProfile', 'listMenu', 'countNotifikasi'));
     }
 
+    public function tampilHeader()
+    {
+        $usr_id = Cookie::get('usr_id');
+        $role = Cookie::get('role');
+        $pengguna = Cookie::get('pengguna');
+
+            if (!$usr_id) {
+                throw new \Exception('User ID tidak ditemukan di cookies.');
+            }
+        // Logika logout, misalnya: Auth::logout();
+        return view('header', compact('userProfile', 'listMenu', 'countNotifikasi'));
+    }
+
+
+
     public function logout()
     {
         // Logika logout, misalnya: Auth::logout();

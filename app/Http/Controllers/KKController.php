@@ -136,44 +136,43 @@ class KKController extends Controller
             'nama' => 'required|max:25',
             'programStudi' => 'required',
             'personInCharge' => 'nullable',
-            'deskripsi' => 'required|min:100|max:200',
+            'deskripsi' => 'required|min:100',
             'gambar' => 'nullable|image|mimes:png|max:10240', // Maks 10MB
         ]);
     
         try {
+            // Ambil usr_id dari cookies
+            $usr_id = Cookie::get('usr_id');
+
+            if (!$usr_id) {
+                throw new \Exception('User ID tidak ditemukan di cookies.');
+            }
             // Simpan gambar jika ada
             $gambarPath = null;
             if ($request->hasFile('gambar')) {
-                // Dapatkan file yang diunggah
                 $file = $request->file('gambar');
-                
-                // Tentukan nama file (opsional, jika ingin menggunakan nama unik)
                 $fileName = time() . '_' . $file->getClientOriginalName();
-            
-                // Tentukan lokasi penyimpanan
                 $destinationPath = public_path('file');
-            
-                // Pindahkan file ke lokasi yang ditentukan
                 $file->move($destinationPath, $fileName);
-            
-                // Simpan path untuk keperluan database
                 $gambarPath = 'file/' . $fileName;
             }
 
-            // Jalankan stored procedure
             $result = DB::select('EXEC pknow_createKelompokKeahlian ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', [
                 $request->nama,            // @p1
                 $request->programStudi,    // @p2
                 $request->personInCharge,  // @p3
                 $request->deskripsi,       // @p4
                 $gambarPath,               // @p5
-                'budi_h',      // @p6 (Created By)
+                $usr_id,    // @p6
                 ...array_fill(6, 44, null) // Sisanya null
             ]);
     
-            // Periksa hasil dari stored procedure
             if (!empty($result) && $result[0]->hasil === 'OK') {
-                return route("kelola_kk");
+                // Redirect ke halaman sesuai role dan pengguna
+                return redirect()->route('kelola_kk', [
+                    'role' => urlencode($request->query('role')), // Ambil role dari query
+                    'pengguna' => urlencode($request->query('pengguna')) // Ambil pengguna dari query
+                ])->with('success', 'Kelompok Keahlian berhasil ditambahkan.');
             } else {
                 throw new \Exception('Terjadi kesalahan saat menyimpan data.');
             }

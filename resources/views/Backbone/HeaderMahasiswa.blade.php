@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="{{ asset('assets/favicon.png') }}" type="image/png">
+    <title>Header</title>
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <link rel="stylesheet" href="path/to/font-awesome/css/all.min.css" />
@@ -28,7 +28,7 @@
       <li class="menu-item">
         <a href="#menu2" class="menu-link">
           <div class="menu-item">
-            <span>Kelompok Keahlian</span>
+            <span>Knowledge Database</span>
             <i class="fas fa-chevron-down"></i>
           </div>
         </a>
@@ -36,13 +36,7 @@
           <li>
             <a onclick="handleKelolaKK()">
             <i class="fas fa-cogs"></i>
-              <span>Kelola Kelompok Keahlian</span>
-            </a>
-          </li>
-          <li>
-            <a href="#sub2">
-            <i class="fas fa-users"></i>
-              <span>Kelola Anggota</span>
+              <span>Daftar Pustaka</span>
             </a>
           </li>
         </ul>
@@ -50,7 +44,7 @@
       <li class="menu-item">
         <a href="#menu3" class="menu-link">
           <div class="menu-item">
-            <span>Knowledge Database</span>
+            <span>I-Learning</span>
             <i class="fas fa-chevron-down"></i>
           </div>
         </a>
@@ -71,6 +65,12 @@
           </div>
         </a>
         <ul class="dropdown-content">
+        <li>
+            <a href="#sub1">
+            <i class="fas fa-graduation-cap"></i>
+              <span>Kelola Materi</span>
+            </a>
+          </li>
           <li>
             <a href="#sub1">
             <i class="fas fa-graduation-cap"></i>
@@ -129,8 +129,14 @@
     </nav>
 </body>
 <script>
-function handleKelolaKK() {
-        window.location.href = `/kelola_kk`;
+  function handleKelolaKK(){
+    const urlParams = new URLSearchParams(window.location.search);
+    const role = urlParams.get('role');
+    const name = urlParams.get('pengguna');
+    window.location.href = `/kelola_kk/${role}?role=${encodeURIComponent(role)}&pengguna=${encodeURIComponent(name)}`;
+  }
+  function showDropdown() {
+  document.querySelector('.profile-dropdown').style.display = 'block';
 }
 
 function handleBeranda() {
@@ -138,11 +144,6 @@ function handleBeranda() {
         window.location.href = `/dashboard/${role}`;
 }
 
-
-
-  function showDropdown() {
-  document.querySelector('.profile-dropdown').style.display = 'block';
-}
 
 function hideDropdown() {
   document.querySelector('.profile-dropdown').style.display = 'none';
@@ -189,6 +190,5 @@ window.onload = function() {
         // Lakukan apa pun dengan data role di sini
    
 };
-
 </script>
 </html>

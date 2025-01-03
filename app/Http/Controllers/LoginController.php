@@ -56,9 +56,11 @@ class LoginController extends Controller
     
             // Store roles in the session
             session(['roles' => $roles]);
-    
-            // Set flag in session to show role selection modal
             session(['showRoleSelectionModal' => true]);
+
+            Cookie::queue('usr_id', $roles[0]['username'], 60 * 24);
+            Cookie::queue('role', $roles[0]['name'], 60 * 24);
+            Cookie::queue('pengguna', $roles[0]['pengguna'], 60 * 24);
     
             return view('page.login.Index')->with('roles', $roles);
         } else {
@@ -68,13 +70,20 @@ class LoginController extends Controller
     }
     
 
-    public function clearRoleSession()
+    public function clearRoleSession(Request $request)
     {
-        session()->forget('showRoleSelectionModal'); // Hapus flag modal
-        session()->forget('roles'); // Hapus roles dari session
-
+        // Hapus data session
+        session()->forget('showRoleSelectionModal');
+        session()->forget('roles');
+    
+        // Hapus cookie yang berkaitan dengan pengguna
+        // Cookie::queue(Cookie::forget('usr_id'));
+        // Cookie::queue(Cookie::forget('role'));
+        // Cookie::queue(Cookie::forget('pengguna'));
+    
         return response()->json(['status' => 'success']);
     }
+
 
 
 }
