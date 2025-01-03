@@ -1,0 +1,169 @@
+:root {
+    --primary-color: rgb(10,94,168);
+    --secondary-color: rgba(8,84,159,1);
+}
+
+.login-background {
+    background-image: url(../assets/backgroundLogin.png);
+    width: 100%; 
+    height: 100vh; 
+    margin-left: 0;
+    flex-shrink: 0;
+    background-size: cover;
+    background-color: var(--primary-color);
+    background-position: center; 
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Style the form box */
+.login-box {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 40px 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 500px;
+    height: 330px;
+
+}
+
+/* Style the title */
+.login-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: #3366ff;
+    margin-bottom: 20px;
+}
+
+/* Style the input fields */
+.login-input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+/* Style the submit button */
+.login-button {
+    width: 98%;
+    padding: 10px;
+    background-color: #3366ff;
+    border: none;
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+/* Add some hover effect to the button */
+.login-button:hover {
+    background-color: #2851a3;
+}
+
+.error-text {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+    display: flex;
+    margin-bottom: -10px;
+  }
+  
+.login-box img {
+    margin-bottom: 10px;
+}
+
+.modal-login {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    padding-top: 15px;
+    align-items: top;
+    z-index: 1000;
+}
+
+.content-modal {
+    width: 500px;
+    background-color: white;
+    border-radius: 15px;
+    overflow-y: auto; /* Enable scrolling if content overflows */
+    padding: 10px;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+.modal-content-role input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #007BFF;
+    border-radius: 50%;
+    position: relative;
+    margin-right: 5px;
+    margin-left: 25px;
+    cursor: pointer;
+}
+
+.tutup {
+    flex-direction: row-reverse;
+    display: flex;
+}
+
+.tutup button {
+    background-color: #2851a3;
+    color: white;
+    font-weight: 600;
+    padding: 9px 25px;
+    border: none;
+    border-radius: 10px;
+    margin-right: 10px;
+}
+
+.modal-content-role .close-button {
+    font-weight: 600;
+    margin-right: 18px;
+    padding: 8px 25px;
+    font-size: 15px;
+    cursor: pointer;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+}
+
+.role-selection, .other-roles {
+    justify-content: space-between;
+    display: flex;
+    font-size: 18px;
+    margin: 10px 18px;
+}
+
+.role-selection a, .other-roles a {
+    text-decoration: none;
+    color: black;
+}
+
+.modal-content hr {
+    border: none;
+    border-top: 1px solid grey;
+    width: 100%;
+    opacity: 0.5;
+}
