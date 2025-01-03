@@ -152,5 +152,17 @@
     }
 </script>
 
+<<<<<<< HEAD
+=======
+<script>
+     function aiiii(prodiId) {
+        if (prodiId) {
+            // Arahkan ke route dengan parameter prodiId
+            window.location.href = "{{ route('kelola_kk.create') }}?prodiId=" + prodiId +"&role=${encodeURIComponent(role)}&pengguna=${encodeURIComponent(name)}";
+        }
+    }
+    </script>
+
+>>>>>>> 890bc16a8f979fb65c2f865433fa44430e1a37cc
 
 @include('backbone.footer')
