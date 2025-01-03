@@ -173,10 +173,7 @@ class KKController extends Controller
     
             // Periksa hasil dari stored procedure
             if (!empty($result) && $result[0]->hasil === 'OK') {
-                return response()->json([
-                    'success' => true,
-                    'redirectUrl' => "/kelola_kk/{$role}?role=" . urlencode($role) . "&pengguna=" . urlencode($pengguna),
-                ]);
+                return route("kelola_kk");
             } else {
                 throw new \Exception('Terjadi kesalahan saat menyimpan data.');
             }
