@@ -1,37 +1,36 @@
-.slider-container{
+.slider-container {
     width: 100%;
+    height: 100vh;
 }
-
 .slick-arrow.slick-next {
     display: none !important;
-  }
+}
 
-  .slick-dots {
+.slick-dots {
     display: flex !important;
     justify-content: center;
     padding: 0;
     margin: 0;
     list-style: none;
-  }
-  
-  .slick-dots li {
+}
+
+.slick-dots li {
     margin: 0 5px;
-  }
-  
-  .slick-dots li button {
+}
+
+.slick-dots li button {
     border: none;
     width: 12px;
     height: 12px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.5);
     transition: background 0.3s ease, transform 0.3s ease;
-  }
-  
-  .slick-dots li.slick-active button {
+}
+
+.slick-dots li.slick-active button {
     background: white;
     transform: scale(1.2);
-  }
-  
+}
 
 .slide {
     position: relative;
@@ -62,7 +61,7 @@
 
 .content-wrapper {
     display: flex;
-    height: 90vh;
+    height: 100vh;
     width: 100%;
     padding-top: 100px;
     background-size: cover;
@@ -72,10 +71,9 @@
     margin-top: 150px;
     margin-left: 90px;
     width: 800px;
-
 }
 
-.mascot{
+.mascot {
     width: 100px;
     display: flex;
 }

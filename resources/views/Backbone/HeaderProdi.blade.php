@@ -36,13 +36,13 @@
           <li>
             <a onclick="handleKelolaKK()">
             <i class="fas fa-cogs"></i>
-              <span>Kelola Kelompok Keahlian</span>
+              <span>PIC Kelompok Keahlian</span>
             </a>
           </li>
           <li>
             <a href="#sub2">
             <i class="fas fa-users"></i>
-              <span>Kelola Anggota</span>
+              <span>Persetujuan Anggota Keahlian</span>
             </a>
           </li>
         </ul>
@@ -130,8 +130,7 @@
 </body>
 <script>
 function handleKelolaKK() {
-  const role = "{{ Cookie::get('role') }}";
-        window.location.href = `/kelola_kk/${role}`;
+        window.location.href = `/kelola_kk`;
 }
 
 function handleBeranda() {

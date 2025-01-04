@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ asset('css/BerandaProdi.css') }}">
 </head>
 <body>
-@include('backbone.header', [
+@include('backbone.HeaderProdi', [
     'showMenu' => false, // Menyembunyikan menu pada halaman login
     'userProfile' => ['name' => 'User', 'role' => 'Guest', 'lastLogin' => ''],
     'menuItems' => [],

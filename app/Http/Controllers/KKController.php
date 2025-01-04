@@ -136,7 +136,7 @@ class KKController extends Controller
             'nama' => 'required|max:25',
             'programStudi' => 'required',
             'personInCharge' => 'nullable',
-            'deskripsi' => 'required|min:100',
+            'deskripsi' => 'required|min:100|max:200',
             'gambar' => 'nullable|image|mimes:png|max:10240', // Maks 10MB
         ]);
     
@@ -200,6 +200,130 @@ class KKController extends Controller
         }
     }
     
+    public function edit(Request $request, $role, $id)
+    {
+        $data = DB::table('pknow_mskelompokkeahlian')
+        ->where('kke_id', $id)
+        ->first(); // Ambil satu baris data
 
+    if (!$data) {
+        return redirect()->route('kelola_kk', ['role' => urlencode($role)])
+            ->with('error', 'Data tidak ditemukan.');
+    }
+
+    $listProdi = DB::select('EXEC pknow_getListProdi ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', 
+        array_fill(0, 50, null));
+    $listProdi = collect($listProdi)->map(function ($item) {
+        return ['value' => $item->Value, 'text' => $item->Text];
+    });
+
+    // Ambil daftar karyawan menggunakan SP
+    $listKaryawan = DB::select('EXEC pknow_getListKaryawan ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', 
+        array_merge([$data->pro_id], array_fill(1, 49, null)));
+    $listKaryawan = collect($listKaryawan)->map(function ($item) {
+        return ['value' => $item->Value, 'text' => $item->Text];
+    });
+    return view('page.master-pic-pknow.KelolaKK.editKK', compact('data', 'listProdi', 'listKaryawan', 'role'));
+    }
+
+    public function update(Request $request, $role, $id)
+    {
+        $request->validate([
+            'nama' => 'required|max:25',
+            'programStudi' => 'required',
+            'personInCharge' => 'nullable',
+            'deskripsi' => 'required|min:100|max:200',
+            'gambar' => 'nullable|image|mimes:png|max:10240', // Maks 10MB
+        ]);
+
+        try {
+            $usr_id = Cookie::get('usr_id');
+            if (!$usr_id) {
+                throw new \Exception('User ID tidak ditemukan di cookies.');
+            }
+
+            $gambarPath = null;
+            if ($request->hasFile('gambar')) {
+                $file = $request->file('gambar');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $destinationPath = public_path('file');
+                $file->move($destinationPath, $fileName);
+                $gambarPath = 'file/' . $fileName;
+            }
+
+            $result = DB::select('EXEC pknow_editKelompokKeahlian ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', [
+                $id,                        // @p1
+                $request->nama,             // @p2
+                $request->programStudi,     // @p3
+                $request->personInCharge,   // @p4
+                $request->deskripsi,        // @p5
+                $gambarPath,                // @p6
+                null, $usr_id,        // @p8
+                ...array_fill(9, 42, null)  // Sisanya null
+            ]);
+
+            if (!empty($result) && $result[0]->hasil === 'OK') {
+                return redirect()->route('kelola_kk', ['role' => urlencode($role)])->with('success', 'Data berhasil diperbarui.');
+            } else {
+                throw new \Exception('Gagal memperbarui data.');
+            }
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+    
+    public function detail(Request $request, $role, $id)
+    {
+        $data = DB::table('pknow_mskelompokkeahlian as kk')
+            ->leftJoin('sia_msprodi as pro', 'kk.pro_id', '=', 'pro.pro_id')
+            ->select('kk.*', 'pro.pro_nama')
+            ->where('kk.kke_id', $id)
+            ->first();
+    
+        if (!$data) {
+            return redirect()->route('kelola_kk', ['role' => urlencode($role)])
+                ->with('error', 'Data tidak ditemukan.');
+        }
+    
+        return view('page.master-pic-pknow.KelolaKK.LihatKK', compact('data', 'role'));
+    }
+
+    public function toggleStatus(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|string',
+            'newStatus' => 'required|string|in:Aktif,Tidak Aktif',
+            'personInCharge' => 'required|string'
+        ]);
+    
+        try {
+            $usr_id = Cookie::get('usr_id');
+            if (!$usr_id) {
+                throw new \Exception('User ID tidak ditemukan.');
+            }
+    
+            if ($request->newStatus === 'Aktif' && empty($request->personInCharge)) {
+                throw new \Exception('Person In Charge harus diisi untuk mengaktifkan.');
+            }
+    
+            $result = DB::select('EXEC pknow_setStatusKelompokKeahlian ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', [
+                $request->id,                // @p1
+                $request->newStatus,         // @p2
+                $request->personInCharge,    // @p3
+                $usr_id,                     // @p4
+                ...array_fill(4, 46, null)   // Sisanya null
+            ]);
+    
+            if (!empty($result) && isset($result[0]->hasil) && $result[0]->hasil === 'SUKSES') {
+                return response()->json(['success' => true, 'message' => 'Status berhasil diperbarui.']);
+            } else {
+                $errorMessage = isset($result[0]->ErrorMessage) ? $result[0]->ErrorMessage : 'Gagal memperbarui status.';
+                throw new \Exception($errorMessage);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+    
     
 }

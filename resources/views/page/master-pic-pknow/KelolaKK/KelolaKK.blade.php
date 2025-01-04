@@ -61,7 +61,6 @@
 <script>
 
 var data = @json($data);
-//ayam bakar md,fhwehj
         const container = document.getElementById('dataContainer');
         container.innerHTML = '';
         console.log("data kk", data);
@@ -69,21 +68,53 @@ var data = @json($data);
             container.innerHTML = '<p class="text-center">Tidak ada data!</p>';
         } else {
             data.forEach(item => {
-                container.innerHTML += `
-                    <div class="col-md-4 mb-4">
-                        <div class="card">
-                             <img src="${item.Gambar ? '/' + item.Gambar : ''}" class="card-img-top" alt="${item['Nama Kelompok Keahlian']}">
-                            <div class="card-body">
-                                <h5 class="card-title">${item['Nama Kelompok Keahlian']}</h5>
-                                <p class="card-text">${item.Deskripsi}</p>
-                                <p class="card-text"><strong>Status:</strong> ${item.Status}</p>
-                                <button class="btn btn-primary me-2" onclick="editData('${item.Key}')">Edit</button>
-                               <button class="btn btn-danger" onclick="deleteData('${item.Key}')">Hapus</button>
+            let statusSpecificButtons = '';
+
+            if (item.Status === 'Draft') {
+                statusSpecificButtons = `
+                    <button class="btn btn-warning mt-2" onclick="toggleStatus('${item.Key}', '${item.Status}', '${item.PersonInCharge}')">
+                        <i class="fas fa-paper-plane"></i> Kirim
+                    </button>
+                    <button class="btn btn-danger mt-2" onclick="deleteData('${item.Key}')">
+                        <i class="fas fa-trash-alt"></i> Hapus
+                    </button>
+                `;
+            } else if (item.Status === 'Aktif') {
+                statusSpecificButtons = `
+                    <button class="btn btn-secondary mt-2" onclick="toggleStatus('${item.Key}', '${item.Status}', '${item.PersonInCharge}')">
+                        <i class="fas fa-toggle-off"></i> Nonaktifkan
+                    </button>
+                `;
+            } else if (item.Status === 'Tidak Aktif') {
+                statusSpecificButtons = `
+                    <button class="btn btn-success mt-2" onclick="toggleStatus('${item.Key}', '${item.Status}', '${item.PersonInCharge}')">
+                        <i class="fas fa-toggle-on"></i> Aktifkan
+                    </button>
+                `;
+            }
+
+            container.innerHTML += `
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="${item.Gambar ? '/' + item.Gambar : ''}" class="card-img-top" alt="${item['Nama Kelompok Keahlian']}">
+                        <div class="card-body">
+                            <h5 class="card-title">${item['Nama Kelompok Keahlian']}</h5>
+                            <p class="card-text">${item.Deskripsi}</p>
+                            <p class="card-text"><strong>Status:</strong> ${item.Status}</p>
+                            <div class="d-flex justify-content-between">
+                                <!-- Permanent Buttons -->
+                                <button class="btn btn-primary" onclick="editData('${item.Key}')"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="btn btn-info" onclick="viewDetail('${item.Key}')"><i class="fas fa-eye"></i> Lihat</button>
+                            </div>
+                            <!-- Status-Specific Buttons -->
+                            <div class="mt-3">
+                                ${statusSpecificButtons}
                             </div>
                         </div>
                     </div>
-                `;
-            });
+                </div>
+            `;
+        });
         }
 
 
@@ -92,27 +123,84 @@ var data = @json($data);
 <script>
         function handleAdd() {
             console.log("Navigating to tambah page");
-            const urlParams = new URLSearchParams(window.location.search);
-            const role = urlParams.get('role');
-            const name = urlParams.get('pengguna');
+            // const urlParams = new URLSearchParams(window.location.search);
+            // const role = urlParams.get('role');
+            // const name = urlParams.get('pengguna');
+
+            const role = "{{ Cookie::get('role') }}"; // Ambil role dari cookie
+            const pengguna = "{{ Cookie::get('pengguna') }}"; // Ambil pengguna dari cookie
+            const name = "{{ Cookie::get('usr_id') }}";
+            console.log("role:", role, "pengguna:", pengguna, "name:", name);
+
             if (!role || !name) {
                 console.error('Role or pengguna parameter missing');
                 return;
             }
-            window.location.href = `/kelola_kk/${role}/tambah?role=${encodeURIComponent(role)}&pengguna=${encodeURIComponent(name)}`;
+            window.location.href = `/kelola_kk/${role}/tambah`;
         }
 
         function editData(id) {
             console.log("Navigating to edit page for ID:", id);
-            const urlParams = new URLSearchParams(window.location.search);
-            const role = urlParams.get('role');
-            const name = urlParams.get('pengguna');
+            // const urlParams = new URLSearchParams(window.location.search);
+            // const role = urlParams.get('role');
+            // const name = urlParams.get('pengguna');
+
+            const role = "{{ Cookie::get('role') }}"; // Ambil role dari cookie
+            const pengguna = "{{ Cookie::get('pengguna') }}"; // Ambil pengguna dari cookie
+            const name = "{{ Cookie::get('usr_id') }}";
+            console.log("role:", role, "pengguna:", pengguna, "name:", name);
             if (!role || !name) {
                 console.error('Role or pengguna parameter missing');
                 return;
             }
-            window.location.href = `/kelola_kk/${role}/edit/${id}?role=${encodeURIComponent(role)}&pengguna=${encodeURIComponent(name)}`;
+            window.location.href = `/kelola_kk/${role}/edit/${id}`;
+            // window.location.href = `/kelola_kk/${role}/edit/${id}?role=${encodeURIComponent(role)}&pengguna=${encodeURIComponent(name)}`;
         }
+
+        function viewDetail(id) {
+            const role = "{{ Cookie::get('role') }}"; // Ambil role dari cookie
+            console.log("Navigating to detail page for ID:", id);
+            window.location.href = `/kelola_kk/${role}/detail/${id}`;
+        }
+
+        function toggleStatus(id, currentStatus, personInCharge) {
+        const newStatus = currentStatus === 'Aktif' ? 'Tidak Aktif' : 'Aktif';
+        const confirmationMessage = `Apakah Anda yakin ingin ${newStatus === 'Aktif' ? 'mengaktifkan' : 'menonaktifkan'} kelompok keahlian ini?`;
+
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: confirmationMessage,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal'
+        }).then(async result => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/kelola_kk/toggleStatus`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({ id, newStatus, personInCharge })
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        Swal.fire('Berhasil!', result.message, 'success');
+                        window.location.reload();
+                    } else {
+                        Swal.fire('Gagal!', result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire('Error!', 'Terjadi kesalahan.', 'error');
+                }
+            }
+        });
+    }
+
 
 </script>
 
@@ -214,14 +302,6 @@ async function fetchData(params = {}) {
     
 </script>
 
-<script>
-     function sambalado(prodiId) {
-        if (prodiId) {
-            // Arahkan ke route dengan parameter prodiId
-            window.location.href = "{{ route('kelola_kk.create') }}?prodiId=" + prodiId +"&role=${encodeURIComponent(role)}&pengguna=${encodeURIComponent(name)}";
-        }
-    }
-    </script>
 
 @if(session('success'))
     <div class="alert alert-success">
