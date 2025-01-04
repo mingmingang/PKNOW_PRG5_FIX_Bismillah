@@ -21,6 +21,16 @@ Route::get('/login', function () {
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/logout', [LoginController::class, 'clearRoleSession'])->name('clearRoleSession');
 
+Route::middleware(['web'])->group(function () {
+    Route::get('/captcha.php', function () {
+        include base_path('captcha.php');
+        exit;
+    });
+
+    Route::post('/login', [LoginController::class, 'login'])->name('login');
+});
+
+
 // ----------------------------------------------------  Return View  ----------------------------------------------------
 // ----------- Beranda View -----------  
 Route::get('/dashboard/PIC P-KNOW', function () {

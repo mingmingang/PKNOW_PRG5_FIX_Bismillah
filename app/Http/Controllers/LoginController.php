@@ -21,7 +21,20 @@ class LoginController extends Controller
         // session()->forget('roles');
     
         // Tangkap inputan user dari form
-        $input = $request->input('username'); // contoh inputan user
+       
+        $input = $request->input('username'); 
+
+        $inputCaptcha = $request->input('captcha');
+        $sessionCaptcha = session('captcha');
+
+    // Debugging untuk memastikan session tersedia
+        error_log("Input Captcha: $inputCaptcha");
+        error_log("Session Captcha: $sessionCaptcha");
+
+        // if ($inputCaptcha !== $sessionCaptcha) {
+        //     return back()->with('error', 'Captcha tidak valid.');
+        // }
+        // contoh inputan user
         
         // Memanggil stored procedure dengan parameter
         $result = DB::select('EXEC sso_getAuthenticationKMS ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', [
@@ -57,6 +70,8 @@ class LoginController extends Controller
             // Store roles in the session
             session(['roles' => $roles]);
             session(['showRoleSelectionModal' => true]);
+            session()->forget('captcha');
+
 
             Cookie::queue('usr_id', $roles[0]['username'], 60 * 24);
             Cookie::queue('role', $roles[0]['name'], 60 * 24);
