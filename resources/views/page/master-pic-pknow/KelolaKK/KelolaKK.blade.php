@@ -122,11 +122,6 @@ var data = @json($data);
 
 <script>
         function handleAdd() {
-            console.log("Navigating to tambah page");
-            // const urlParams = new URLSearchParams(window.location.search);
-            // const role = urlParams.get('role');
-            // const name = urlParams.get('pengguna');
-
             const role = "{{ Cookie::get('role') }}"; // Ambil role dari cookie
             const pengguna = "{{ Cookie::get('pengguna') }}"; // Ambil pengguna dari cookie
             const name = "{{ Cookie::get('usr_id') }}";
