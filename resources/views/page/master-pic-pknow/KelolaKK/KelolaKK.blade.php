@@ -123,10 +123,6 @@ var data = @json($data);
 <script>
         function handleAdd() {
             console.log("Navigating to tambah page");
-            // const urlParams = new URLSearchParams(window.location.search);
-            // const role = urlParams.get('role');
-            // const name = urlParams.get('pengguna');
-
             const role = "{{ Cookie::get('role') }}"; // Ambil role dari cookie
             const pengguna = "{{ Cookie::get('pengguna') }}"; // Ambil pengguna dari cookie
             const name = "{{ Cookie::get('usr_id') }}";
@@ -141,10 +137,6 @@ var data = @json($data);
 
         function editData(id) {
             console.log("Navigating to edit page for ID:", id);
-            // const urlParams = new URLSearchParams(window.location.search);
-            // const role = urlParams.get('role');
-            // const name = urlParams.get('pengguna');
-
             const role = "{{ Cookie::get('role') }}"; // Ambil role dari cookie
             const pengguna = "{{ Cookie::get('pengguna') }}"; // Ambil pengguna dari cookie
             const name = "{{ Cookie::get('usr_id') }}";
@@ -154,7 +146,6 @@ var data = @json($data);
                 return;
             }
             window.location.href = `/kelola_kk/${role}/edit/${id}`;
-            // window.location.href = `/kelola_kk/${role}/edit/${id}?role=${encodeURIComponent(role)}&pengguna=${encodeURIComponent(name)}`;
         }
 
         function viewDetail(id) {
@@ -164,42 +155,61 @@ var data = @json($data);
         }
 
         function toggleStatus(id, currentStatus, personInCharge) {
-        const newStatus = currentStatus === 'Aktif' ? 'Tidak Aktif' : 'Aktif';
-        const confirmationMessage = `Apakah Anda yakin ingin ${newStatus === 'Aktif' ? 'mengaktifkan' : 'menonaktifkan'} kelompok keahlian ini?`;
+    let newStatus;
+    let confirmationMessage;
 
-        Swal.fire({
-            title: 'Konfirmasi',
-            text: confirmationMessage,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya',
-            cancelButtonText: 'Batal'
-        }).then(async result => {
-            if (result.isConfirmed) {
-                try {
-                    const response = await fetch(`/kelola_kk/toggleStatus`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify({ id, newStatus, personInCharge })
-                    });
-
-                    const result = await response.json();
-                    if (result.success) {
-                        Swal.fire('Berhasil!', result.message, 'success');
-                        window.location.reload();
-                    } else {
-                        Swal.fire('Gagal!', result.message, 'error');
-                    }
-                } catch (error) {
-                    console.error(error);
-                    Swal.fire('Error!', 'Terjadi kesalahan.', 'error');
-                }
-            }
-        });
+    if (currentStatus === "Draft") {
+        if (personInCharge) {
+            // Jika PIC sudah ada, ubah status menjadi Aktif
+            newStatus = "Aktif";
+            confirmationMessage = "Apakah Anda yakin ingin mengaktifkan kelompok keahlian ini?";
+        } else {
+            // Jika PIC belum ada, ubah status menjadi Menunggu
+            newStatus = "Menunggu";
+            confirmationMessage = "Person In Charge belum ditentukan. Apakah Anda yakin ingin mengirim kelompok keahlian ini untuk ditinjau?";
+        }
+    } else if (currentStatus === "Aktif") {
+        newStatus = "Tidak Aktif";
+        confirmationMessage = "Apakah Anda yakin ingin menonaktifkan kelompok keahlian ini?";
+    } else if (currentStatus === "Tidak Aktif") {
+        newStatus = "Aktif";
+        confirmationMessage = "Apakah Anda yakin ingin mengaktifkan kembali kelompok keahlian ini?";
     }
+
+    Swal.fire({
+        title: "Konfirmasi",
+        text: confirmationMessage,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Ya",
+        cancelButtonText: "Batal",
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/kelola_kk/toggleStatus`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector("meta[name='csrf-token']").getAttribute("content"),
+                    },
+                    body: JSON.stringify({ id, newStatus, personInCharge }),
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    Swal.fire("Berhasil!", result.message, "success");
+                    window.location.reload();
+                } else {
+                    Swal.fire("Gagal!", result.message, "error");
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire("Error!", "Terjadi kesalahan.", "error");
+            }
+        }
+    });
+}
+
 
 
 </script>
