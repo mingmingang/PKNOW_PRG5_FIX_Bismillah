@@ -40,11 +40,11 @@
             </a>
           </li>
           <li>
-            <a href="#sub2">
-            <i class="fas fa-users"></i>
-              <span>Persetujuan Anggota Keahlian</span>
-            </a>
-          </li>
+                                <a onclick="handlePersetujuan()">
+                                    <i class="fas fa-users"></i>
+                                    <span>Persetujuan Anggota Keahlian</span>
+                                </a>
+             </li>
         </ul>
       </li>
       <li class="menu-item">
@@ -131,6 +131,11 @@
 <script>
 function handlePICKK() {
   window.location.href = `/prodi/kelola_pic`;
+}
+
+function handlePersetujuan() {
+        const role = "{{ Cookie::get('role') }}";
+        window.location.href = `/persetujuan/${role}`;
 }
 
 function handleBeranda() {
