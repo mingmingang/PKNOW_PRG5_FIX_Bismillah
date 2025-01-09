@@ -4,13 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Beranda Mahasiswa</title>
+    <link rel="icon" href="{{ asset('assets/favicon.png') }}" type="image/png">
 
     <link rel="stylesheet" href="{{ asset('css/BerandaPengguna.css') }}">
 </head>
 
 <body>
-    @include('backbone.header', [
+    @include('backbone.HeaderMahasiswa', [
     'showMenu' => false, // Menyembunyikan menu pada halaman login
     'userProfile' => ['name' => 'User', 'role' => 'Guest', 'lastLogin' => ''],
     'menuItems' => [],

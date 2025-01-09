@@ -26,28 +26,6 @@
         </a>
       </li>
       <li class="menu-item">
-        <a href="#menu2" class="menu-link">
-          <div class="menu-item">
-            <span>Kelompok Keahlian</span>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-        </a>
-        <ul class="dropdown-content">
-          <li>
-            <a onclick="handleKelolaKK()">
-            <i class="fas fa-cogs"></i>
-              <span>Kelola Kelompok Keahlian</span>
-            </a>
-          </li>
-          <li>
-            <a onclick="handleKelolaAKK()">
-            <i class="fas fa-users"></i>
-              <span>Kelola Anggota</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-      <li class="menu-item">
         <a href="#menu3" class="menu-link">
           <div class="menu-item">
             <span>Knowledge Database</span>
@@ -71,6 +49,12 @@
           </div>
         </a>
         <ul class="dropdown-content">
+        <li>
+            <a href="#sub1">
+            <i class="fas fa-graduation-cap"></i>
+              <span>Kelola Program</span>
+            </a>
+          </li>
           <li>
             <a href="#sub1">
             <i class="fas fa-graduation-cap"></i>
@@ -130,8 +114,7 @@
 </body>
 <script>
 function handleKelolaKK() {
-  const role = "{{ Cookie::get('role') }}";
-        window.location.href = `/kelola_kk/${role}`;
+        window.location.href = `/kelola_kk`;
 }
 
 function handleBeranda() {
@@ -139,14 +122,6 @@ function handleBeranda() {
         window.location.href = `/dashboard/${role}`;
 }
 
-function handleKelolaAKK() {
-  const role = "{{ Cookie::get('role') }}";
-  if (!role) {
-    alert('Role tidak ditemukan!');
-    return;
-  }
-  window.location.href = `/kelola_akk/${role}`;
-}
 
 
   function showDropdown() {

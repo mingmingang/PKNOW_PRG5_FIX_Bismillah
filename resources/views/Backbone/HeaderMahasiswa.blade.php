@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Header</title>
+    <link rel="icon" href="{{ asset('assets/favicon.png') }}" type="image/png">
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <link rel="stylesheet" href="path/to/font-awesome/css/all.min.css" />
@@ -26,7 +26,7 @@
         </a>
       </li>
       <li class="menu-item">
-        <a href="#menu2" class="menu-link">
+        <a href="#menu3" class="menu-link">
           <div class="menu-item">
             <span>Knowledge Database</span>
             <i class="fas fa-chevron-down"></i>
@@ -34,23 +34,7 @@
         </a>
         <ul class="dropdown-content">
           <li>
-            <a onclick="handleKelolaKK()">
-            <i class="fas fa-cogs"></i>
-              <span>Daftar Pustaka</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-      <li class="menu-item">
-        <a href="#menu3" class="menu-link">
-          <div class="menu-item">
-            <span>I-Learning</span>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-        </a>
-        <ul class="dropdown-content">
-          <li>
-            <a href="#sub1">
+            <a onclick="handlePustaka()">
             <i class="fas fa-book"></i>
               <span>Daftar Pustaka</span>
             </a>
@@ -65,12 +49,6 @@
           </div>
         </a>
         <ul class="dropdown-content">
-        <li>
-            <a href="#sub1">
-            <i class="fas fa-graduation-cap"></i>
-              <span>Kelola Materi</span>
-            </a>
-          </li>
           <li>
             <a href="#sub1">
             <i class="fas fa-graduation-cap"></i>
@@ -144,6 +122,15 @@ function handleBeranda() {
         window.location.href = `/dashboard/${role}`;
 }
 
+function handlePustaka(){
+    const role = "{{ Cookie::get('role') }}";
+    window.location.href = `/daftar_pustaka/${role}`;
+}
+
+function handleMateri(){
+    window.location.href = `/Materi`;
+}
+
 
 function hideDropdown() {
   document.querySelector('.profile-dropdown').style.display = 'none';
@@ -180,9 +167,8 @@ window.onload = function() {
     console.log('usr_id dari cookie:', usrId);
     const role = "{{ Cookie::get('role') }}";
     console.log('role dari cookie:', role);
-    const pengguna = "{{ Cookie::get('pengguna') }}";
-    console.log('pengguna dari cookie:', pengguna);
-    
+    const pengguna = "{!! Cookie::get('pengguna') !!}";
+console.log('pengguna dari cookie:', pengguna);
    
         document.getElementById('role-title').textContent = `${role}`;
         document.getElementById('role-nama').textContent = `${pengguna}`;

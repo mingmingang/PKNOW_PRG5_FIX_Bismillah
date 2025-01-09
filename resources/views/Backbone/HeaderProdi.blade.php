@@ -34,15 +34,15 @@
         </a>
         <ul class="dropdown-content">
           <li>
-            <a onclick="handleKelolaKK()">
+            <a onclick="handlePICKK()">
             <i class="fas fa-cogs"></i>
-              <span>Kelola Kelompok Keahlian</span>
+              <span>PIC Kelompok Keahlian</span>
             </a>
           </li>
           <li>
-            <a onclick="handleKelolaAKK()">
+            <a href="#sub2">
             <i class="fas fa-users"></i>
-              <span>Kelola Anggota</span>
+              <span>Persetujuan Anggota Keahlian</span>
             </a>
           </li>
         </ul>
@@ -129,9 +129,8 @@
     </nav>
 </body>
 <script>
-function handleKelolaKK() {
-  const role = "{{ Cookie::get('role') }}";
-        window.location.href = `/kelola_kk/${role}`;
+function handlePICKK() {
+  window.location.href = `/prodi/kelola_pic`;
 }
 
 function handleBeranda() {
@@ -139,14 +138,6 @@ function handleBeranda() {
         window.location.href = `/dashboard/${role}`;
 }
 
-function handleKelolaAKK() {
-  const role = "{{ Cookie::get('role') }}";
-  if (!role) {
-    alert('Role tidak ditemukan!');
-    return;
-  }
-  window.location.href = `/kelola_akk/${role}`;
-}
 
 
   function showDropdown() {

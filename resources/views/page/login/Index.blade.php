@@ -34,12 +34,28 @@
 <main>
     <section class="login-background">
         <div class="login-container">
+        <div style="width: 600px; margin-right:100px; text-align:center;">
+              <h3 style="font-weight: bold;color:#0A5EA8;" >Mulai langkah awal pembelajaranmu dengan P-KNOW</h3>
+              <img src="{{ asset('assets/loginMaskotTMS.png') }}" alt="" width="600px"/>
+            </div>
             <div class="login-box">
                 <img src="{{ asset('assets/pknow.png') }}" class="pknow" alt="Logo P-KNOW" title="Logo P-KNOW" width="300px">
                 <form method="POST" action="{{ route('login') }}" class="login-form">
                     @csrf
                     <input type="text" class="login-input" name="username" placeholder="Nama Pengguna" required>
                     <input type="password" class="login-input" name="password" placeholder="Kata Sandi" required>
+                    <div class="d-flex justify-content-between mt-3">
+                        <img src="{{ route('captcha.generate') }}?rand={{ rand() }}" id="captcha_image">
+                        <div class="mt-0">
+                            <input type="text" name="captcha" class="login-input ml-3 mt-2" required placeholder="Masukan Captcha">
+                        </div>
+                        <p class="mt-3">
+                            <a href="javascript: refreshCaptcha();"><i class="fas fa-sync-alt mr-3"></i></a>
+                        </p>
+                    </div>
+                    
+                    
+                    
 
                     @if (session('error'))
                         <p class="error-text">{{ session('error') }}</p>
@@ -50,8 +66,8 @@
 
                 <!-- Modal for Role Selection -->
                 <div id="roleModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
+                    <div class="modal-dialog" style="border-radius: 100px;">
+                        <div class="modal-content" style="border-radius: 10px;">
                             <div class="modal-header">
                                 <h5 class="modal-title">Pilih Peran</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -59,9 +75,14 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <ul id="roleList" class="list-group" style="text-align: left;">
+                                <ul id="roleList" class="list-group" style="text-align: left;border:none;">
                                     <!-- Roles will be inserted dynamically -->
                                 </ul>
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" data-dismiss="modal" aria-label="Close" style="font-size: 16px; color:white; background:#0A5EA8; border:none; padding:5px 15px; border-radius:10px;font-weight:600;">
+                                    Tutup
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -111,6 +132,13 @@
     });
 </script>
 
+<script>
+//Refresh Captcha
+function refreshCaptcha() {
+        var img = document.images['captcha_image'];
+        img.src = img.src.split('?')[0] + "?rand=" + Math.random() * 1000;
+    }
+</script>
 
 
 

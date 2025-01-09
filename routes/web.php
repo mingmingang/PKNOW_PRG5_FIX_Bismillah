@@ -26,7 +26,9 @@ Route::post('/logout', [LoginController::class, 'clearRoleSession'])->name('clea
 Route::get('/dashboard/PIC P-KNOW', function () {
     return view('Backbone/BerandaUtama');
 });
-
+Route::get('/dashboard/Program Studi', function () {
+    return view('Backbone/BerandaProdi');
+});
 
 Route::get('/beranda_utama', function () {
     return view('Backbone.BerandaUtama');
@@ -37,6 +39,10 @@ Route::get('/kelola_kk', [KKController::class, 'getTempDataKK'])->name('kelola_k
 Route::get('/kelola_kk/PIC P-KNOW', [KKController::class, 'getTempDataKK'])->name('kelola_kk.getTempDataKK');
 Route::get('/kelola_kk/PIC P-KNOW/tambah', [KKController::class, 'create'])->name('kelola_kk.create');
 Route::post('/kelola_kk/PIC P-KNOW/tambah', [KKController::class, 'store'])->name('kelola_kk.store');
+Route::get('/kelola_kk/{role}/edit/{id}', [KKController::class, 'edit'])->name('kelola_kk.edit');
+Route::post('/kelola_kk/{role}/update/{id}', [KKController::class, 'update'])->name('kelola_kk.update');
+Route::get('/kelola_kk/{role}/detail/{id}', [KKController::class, 'detail'])->name('kelola_kk.detail');
+Route::post('/kelola_kk/toggleStatus', [KKController::class, 'toggleStatus'])->name('kelola_kk.toggleStatus');
 Route::get('/get-list-karyawan', [KKController::class, 'getListKaryawan'])->name('kelola_kk.getKaryawan');
 Route::delete('/kelola_kk/deleteKK/{id}', [KKController::class, 'deleteKelompokKeahlian'])->name('kelola_kk.delete');
 
@@ -58,6 +64,10 @@ Route::get('/dashboard/PIC P-KNOW', function () {
 // Tenaga Pendidik
 Route::get('/dashboard/Tenaga Pendidik', function () {
     return view('Backbone/BerandaTenagaPendidik');
+});
+
+Route::get('/dashboard/Mahasiswa', function () {
+    return view('Backbone/BerandaMahasiswa');
 });
 
 

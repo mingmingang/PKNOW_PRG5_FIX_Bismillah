@@ -4,6 +4,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Tambah Kelompok Keahlian</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
@@ -36,7 +37,7 @@
             
                 @csrf
                 <div class="mb-3">
-                    <label for="nama" class="form-label">Nama Kelompok Keahlian</label>
+                    <label for="nama" class="form-label">Nama Kelompok Keahlian (Maksimal 25 Huruf)</label> <span style="color: red;">*</span>
                     <input type="text" name="nama" id="nama" class="form-control @error('nama') is-invalid @enderror" value="{{ old('nama') }}" required>
                     @error('nama')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -44,7 +45,8 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="deskripsi" class="form-label">Deskripsi</label>
+                    <label for="deskripsi" class="form-label">Deskripsi (Minimal 100 huruf)<span style="color: red;"> *
+                    </span></label>
                     <textarea name="deskripsi" id="deskripsi" rows="4" class="form-control @error('deskripsi') is-invalid @enderror" required>{{ old('deskripsi') }}</textarea>
                     @error('deskripsi')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -52,7 +54,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="programStudi" class="form-label">Program Studi</label>
+                    <label for="programStudi" class="form-label">Program Studi</label> <span style="color: red;">*</span>
                     <select name="programStudi" id="programStudi" class="form-select @error('programStudi') is-invalid @enderror" required >
                         <option value="">-- Pilih Program Studi --</option>
                         @foreach($listProdi as $prodi)
@@ -66,19 +68,15 @@
                     @enderror
                 </div>
 
-                <div class="mb-3">
-                    <label for="personInCharge" class="form-label">Person In Charge</label>
-                    <select name="personInCharge" id="personInCharge" class="form-select @error('personInCharge') is-invalid @enderror">
-                        <option value="">-- Pilih PIC --</option>
-                        <!-- Data PIC akan dimuat secara dinamis -->
-                    </select>
-                    @error('personInCharge')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
+                <select name="personInCharge" id="personInCharge" class="form-control">
+                    <option value="">-- Pilih PIC Kelompok Keahlian --</option>
+                    @foreach ($listKaryawan as $item)
+                        <option value="{{ $item['value'] }}">{{ $item['text'] }}</option>
+                    @endforeach
+                </select>
 
                 <div class="mb-3">
-                    <label for="gambar" class="form-label">Gambar (PNG, max 10MB)</label>
+                    <label for="gambar" class="form-label">Gambar (PNG, max 10MB)</label><span style="color: red;">*</span>
                     <input type="file" name="gambar" id="gambar" class="form-control @error('gambar') is-invalid @enderror">
                     @error('gambar')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -87,6 +85,7 @@
 
                 <div class="d-flex justify-content-end">
                     <button type="reset" class="btn btn-secondary me-2">Batalkan</button>
+                    <button type="" class="btn btn-secondary me-2" onclick="handleback()">Batalkan</button>
                     <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </form>
@@ -187,36 +186,56 @@
     }
 </script>
 
-<<<<<<< HEAD
-=======
 <script>
-     function aiiii(prodiId) {
-        if (prodiId) {
-            // Arahkan ke route dengan parameter prodiId
-            window.location.href = "{{ route('kelola_kk.create') }}?prodiId=" + prodiId +"&role=${encodeURIComponent(role)}&pengguna=${encodeURIComponent(name)}";
-        }
-    }
-    </script>
-
->>>>>>> 890bc16a8f979fb65c2f865433fa44430e1a37cc
-
-
-<script>
-     function sambalado(prodiId) {
-        if (prodiId) {
-            // Arahkan ke route dengan parameter prodiId
-            window.location.href = "{{ route('kelola_kk.create') }}?prodiId=" + prodiId +"&role=${encodeURIComponent(role)}&pengguna=${encodeURIComponent(name)}";
-        }
+    function handleback() {
+        window.history.back();
     }
     </script>
 
 <script>
-     function coba(prodiId) {
-        if (prodiId) {
-            // Arahkan ke route dengan parameter prodiId
-            window.location.href = "{{ route('kelola_kk.create') }}?prodiId=" + prodiId +"&role=${encodeURIComponent(role)}&pengguna=${encodeURIComponent(name)}";
-        }
-    }
-    </script>
+    $(document).ready(function () {
+        $("#formId").on("submit", function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            const formData = new FormData(this);
+
+            $.ajax({
+                url: "{{ route('kelola_kk.store') }}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: "Berhasil!",
+                            text: response.message,
+                            icon: "success",
+                            confirmButtonText: "OK",
+                        }).then(() => {
+                            // Redirect atau refresh data jika diperlukan
+                            window.location.href = "{{ route('kelola_kk') }}";
+                        });
+                    } else {
+                        Swal.fire({
+                            title: "Gagal!",
+                            text: response.message,
+                            icon: "error",
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: xhr.responseJSON.message || "Terjadi kesalahan.",
+                        icon: "error",
+                    });
+                },
+            });
+        });
+    });
+</script>
+
 @include('backbone.footer')
+
 
