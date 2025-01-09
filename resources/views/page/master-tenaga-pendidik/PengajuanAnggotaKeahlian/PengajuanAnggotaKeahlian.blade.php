@@ -186,7 +186,7 @@
 
     <script>
         
-    const apiLink = "{{ route('kelola_kk.getTempDataKK') }}";
+    const apiLink = "{{ route('pengajuan_KK') }}";
     console.log(apiLink);
     var data = @json($data);
     console.log("ayamansdf");

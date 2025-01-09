@@ -54,6 +54,10 @@
     <button class="btn btn-primary" onclick="handleSearch()">Filter</button>
 </div>
 
+<div class="mt-3">
+    <button class="btn btn-primary" onclick="handleAdd()">Tambah</button>
+</div>
+
 <!-- Container -->
 <div class="container" style="margin-top: 50px;">
     <!-- Data Aktif -->

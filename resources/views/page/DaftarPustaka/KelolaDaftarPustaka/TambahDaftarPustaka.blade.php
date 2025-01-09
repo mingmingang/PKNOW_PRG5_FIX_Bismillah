@@ -128,3 +128,4 @@
     //
 </script>
 
+@include('backbone.footer')

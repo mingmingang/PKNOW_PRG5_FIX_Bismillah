@@ -545,3 +545,5 @@
     @endif
     //
 </script>
+
+@include('backbone.footer')

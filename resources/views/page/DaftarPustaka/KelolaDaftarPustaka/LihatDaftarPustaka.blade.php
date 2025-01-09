@@ -89,3 +89,4 @@
     <button class="btn btn-secondary me-3 mt-3 mb-3" onclick="window.history.back()">Kembali</button>
 
 </div>
+@include('backbone.footer')

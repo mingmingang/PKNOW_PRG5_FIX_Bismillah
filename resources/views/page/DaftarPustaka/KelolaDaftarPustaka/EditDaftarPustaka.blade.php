@@ -120,3 +120,4 @@
     }//
 </script>
 
+@include('backbone.footer')
