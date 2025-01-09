@@ -35,56 +35,66 @@ class KKController extends Controller
         return view('page.master-pic-pknow.KelolaKK.KelolaKK', compact('dataFilterSort', 'dataFilterStatus', 'roles'));
     }
 
-    public function getTempDataKK(Request $request)
-    {
-        $dataFilterSort = [
-            ['Value' => '[Nama Kelompok Keahlian] asc', 'Text' => 'Nama Kelompok Keahlian [↑]'],
-            ['Value' => '[Nama Kelompok Keahlian] desc', 'Text' => 'Nama Kelompok Keahlian [↓]'],
-        ];
     
-        $dataFilterStatus = [
-            ['Value' => '', 'Text' => 'Semua'],
-            ['Value' => 'Menunggu', 'Text' => 'Menunggu PIC Prodi'],
-            ['Value' => 'Draft', 'Text' => 'Draft'],
-            ['Value' => 'Aktif', 'Text' => 'Aktif'],
-            ['Value' => 'Tidak Aktif', 'Text' => 'Tidak Aktif'],
-        ];
+    public function getTempDataKK(Request $request, $role)
+    {
+        // Debugging untuk memastikan parameter diterima
+        error_log('Role: ' . $role);
+        error_log('Request Params: ' . print_r($request->all(), true));
     
         $params = [
-            $request->input('page', 1),                // @p1: Halaman saat ini
-            $request->input('query', ''),             // @p2: Filter "Nama Kelompok Keahlian"
-            $request->input('sort', '[Nama Kelompok Keahlian] ASC'), // @p3: Urutan
-            $request->input('status', ''),            // @p4: Filter status
-            '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+            $request->input('page', 1), // @p1
+            $request->input('query', '') !== null ? $request->input('query', '') : '', // @p2
+            $request->input('sort', '[Nama Kelompok Keahlian] ASC'), // @p3
+            $request->input('status', ''), // @p4
+            ...array_fill(4, 46, null), // @p5 sampai @p50
         ];
     
         try {
-            // Panggil stored procedure
+            // Debugging parameter yang dikirim ke SP
+            error_log('Parameters ke SP: ' . print_r($params, true));
+    
+            // Eksekusi stored procedure
             $data = DB::select('EXEC pknow_getTempDataKelompokKeahlian ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', $params);
+            
+            
+            // Debugging hasil dari SP
+            error_log('Data dari SP: ' . print_r($data, true));
+            error_log('Request Headers: ' . print_r($request->header(), true));
+
     
-            // Untuk permintaan AJAX (fetch API atau axios)
+            // Jika permintaan menggunakan AJAX, kembalikan JSON
             if ($request->ajax()) {
-                if (count($data) === 0) {
-                    return response()->json(['message' => 'Tidak ada data.'], 200); // Jika data kosong
-                }
-    
-                return response()->json($data); // Kembalikan data JSON
+                error_log('Mengembalikan JSON: ' . json_encode($data));
+                return response()->json($data);
+            } else {
+                error_log('Deteksi AJAX: Permintaan dianggap bukan AJAX');
+                // Kembalikan view untuk akses biasa
+                $dataFilterSort = [
+                    ['Value' => '[Nama Kelompok Keahlian] asc', 'Text' => 'Nama Kelompok Keahlian [↑]'],
+                    ['Value' => '[Nama Kelompok Keahlian] desc', 'Text' => 'Nama Kelompok Keahlian [↓]'],
+                ];
+            
+                $dataFilterStatus = [
+                    ['Value' => '', 'Text' => 'Semua'],
+                    ['Value' => 'Menunggu', 'Text' => 'Menunggu PIC Prodi'],
+                    ['Value' => 'Draft', 'Text' => 'Draft'],
+                    ['Value' => 'Aktif', 'Text' => 'Aktif'],
+                    ['Value' => 'Tidak Aktif', 'Text' => 'Tidak Aktif'],
+                ];
+            
+                return view('page.master-pic-pknow.KelolaKK.KelolaKK', compact('data', 'dataFilterSort', 'dataFilterStatus'));
             }
-    
-            // Untuk tampilan view di browser
-            return view('page.master-pic-pknow.KelolaKK.KelolaKK', compact('dataFilterSort', 'dataFilterStatus', 'data'));
-    
         } catch (\Exception $e) {
-            if ($request->ajax()) {
-                return response()->json([
-                    'error' => 'Terjadi kesalahan saat mengambil data.',
-                    'details' => $e->getMessage(),
-                ], 500);
-            }
-    
-            return back()->with('error', 'Terjadi kesalahan saat mengambil data.');
+            error_log('Error saat memproses: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Terjadi kesalahan saat mengambil data.',
+                'details' => $e->getMessage(),
+            ], 500);
         }
     }
+    
+    
     
     public function create(Request $request)
     {
@@ -118,8 +128,6 @@ class KKController extends Controller
     
         return view('page.master-pic-pknow.KelolaKK.TambahKK', compact('listProdi', 'listKaryawan', 'roles'));
     }
-    
-    
     
 
     public function getListKaryawan(Request $request)
@@ -309,7 +317,12 @@ class KKController extends Controller
                 ->with('error', 'Data tidak ditemukan.');
         }
     
-        return view('page.master-pic-pknow.KelolaKK.LihatKK', compact('data', 'role'));
+        // Gunakan role untuk menentukan tampilan blade
+        if ($role === 'prodi') {
+            return view('page.master-prodi.KelolaKK.LihatKK', compact('data', 'role'));
+        } else {
+            return view('page.master-pic-pknow.KelolaKK.LihatKK', compact('data', 'role'));
+        }
     }
     
     public function toggleStatus(Request $request)
@@ -317,7 +330,7 @@ class KKController extends Controller
         $request->validate([
             'id' => 'required|string',
             'newStatus' => 'required|string|in:Aktif,Tidak Aktif,Menunggu',
-            'personInCharge' => 'nullable|string',
+            'personInCharge' => 'nullable|string', // PIC bisa nullable
         ]);
     
         try {
@@ -326,38 +339,32 @@ class KKController extends Controller
                 throw new \Exception('User ID tidak ditemukan.');
             }
     
-            // Ambil data kelompok keahlian berdasarkan ID
-            $kelompokKeahlian = DB::table('pknow_mskelompokkeahlian')
-                ->where('kke_id', $request->id)
-                ->first();
-    
-            if (!$kelompokKeahlian) {
-                throw new \Exception('Data Kelompok Keahlian tidak ditemukan.');
-            }
-    
-            // Jika status saat ini adalah Draft
-            if ($kelompokKeahlian->kke_status === 'Draft') {
-                if (empty($kelompokKeahlian->kry_id)) {
-                    // Jika PIC belum ada, ubah status menjadi Menunggu
-                    $request->merge(['newStatus' => 'Menunggu']);
-                } else {
-                    // Jika PIC ada, ubah status menjadi Aktif
-                    $request->merge(['newStatus' => 'Aktif']);
-                }
-            }
-    
-            // Panggil SP untuk mengubah status
-            $result = DB::select('EXEC pknow_setStatusKelompokKeahlian ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', [
-                $request->id,                // @p1
-                $request->newStatus,         // @p2
-                $request->personInCharge,    // @p3
-                $usr_id,                     // @p4
-                ...array_fill(4, 46, null),  // Sisanya null
+            Log::info('Toggle Status Payload:', [
+                'id' => $request->id,
+                'newStatus' => $request->newStatus,
+                'personInCharge' => $request->personInCharge,
             ]);
     
-            // Periksa hasil dari SP
+            $id = $request->id;
+            $newStatus = $request->newStatus;
+            $personInCharge = $request->personInCharge;
+    
+            $params = [
+                $id,                  // @p1
+                $newStatus,           // @p2
+                $personInCharge,      // @p3
+                $usr_id,              // @p4
+                now(),                // @p5
+                ...array_fill(5, 45, null), // @p6 sampai @p50
+            ];
+    
+            $result = DB::select(
+                'EXEC pknow_setStatusKelompokKeahlian ' . implode(', ', array_fill(0, count($params), '?')),
+                $params
+            );
+    
             if (!empty($result) && isset($result[0]->hasil) && $result[0]->hasil === 'SUKSES') {
-                return response()->json(['success' => true, 'message' => 'Status berhasil diperbarui.']);
+                return response()->json(['success' => true, 'message' => "Status berhasil diubah menjadi '$newStatus'."]);
             } else {
                 throw new \Exception('Gagal memperbarui status.');
             }
@@ -367,9 +374,12 @@ class KKController extends Controller
     }
     
     
+    
     public function kelolaPICIndex()
     {
         $userId = Cookie::get('usr_id'); 
+        $role = Cookie::get('role'); // Ambil role dari cookie
+    
         if (!$userId) {
             return redirect()->route('login')->with('error', 'User tidak ditemukan. Silakan login kembali.');
         }
@@ -384,8 +394,9 @@ class KKController extends Controller
             return back()->with('error', 'Terjadi kesalahan saat mengambil data.');
         }
     
-        return view('page.master-prodi.KelolaPICKK.KelolaPICKK', compact('data'));
+        return view('page.master-prodi.KelolaPICKK.KelolaPICKK', compact('data', 'role'));
     }
+    
     
     
 
@@ -491,29 +502,180 @@ class KKController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-    
-    public function lihatKK($id)
+
+    public function kelolaAKK(Request $request, $role)
     {
-        // Ambil data Kelompok Keahlian berdasarkan ID
-        $data = DB::table('pknow_mskelompokkeahlian as kk')
-            ->leftJoin('sia_msprodi as pro', 'kk.pro_id', '=', 'pro.pro_id')
-            ->leftJoin('ERP_PolmanAstra.dbo.ess_mskaryawan as kry', 'kk.kry_id', '=', 'kry.kry_id')
-            ->select(
-                'kk.*',
-                'pro.pro_nama',
-                DB::raw("CONCAT(kry.kry_nama_depan, ' ', kry.kry_nama_blkg) as kry_nama")
-            )
-            ->where('kk.kke_id', $id)
-            ->first();
+        $query = $request->input('query', ''); // Ambil query dari input
     
-        // Jika data tidak ditemukan, kembali ke halaman sebelumnya
-        if (!$data) {
-            return redirect()->route('kelola_kk')->with('error', 'Data tidak ditemukan.');
+        $params = [
+            $request->input('page', 1), // @p1
+            $query ?: '%', // @p2 (Jika kosong, gunakan '%' untuk menampilkan semua data)
+            $request->input('sort', '[Nama Kelompok Keahlian] ASC'), // @p3
+            'Aktif', // Filter status hanya "Aktif" untuk @p4
+            ...array_fill(4, 46, null), // @p5 sampai @p50
+        ];
+    
+        try {
+            // Panggil stored procedure langsung
+            $data = DB::select('EXEC pknow_getTempDataKelompokKeahlian ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', $params);
+    
+            // Debug data untuk memastikan hasil
+            error_log('Data Kelola AKK: ' . print_r($data, true));
+    
+            $dataFilterSort = [
+                ['Value' => '[Nama Kelompok Keahlian] asc', 'Text' => 'Nama Kelompok Keahlian [↑]'],
+                ['Value' => '[Nama Kelompok Keahlian] desc', 'Text' => 'Nama Kelompok Keahlian [↓]'],
+            ];
+    
+            return view('page.master-pic-pknow.KelolaAKK.KelolaAKK', [
+                'data' => collect($data), // Konversi menjadi collection untuk kemudahan manipulasi
+                'dataFilterSort' => $dataFilterSort,
+            ]);
+        } catch (\Exception $e) {
+            error_log('Error di Kelola AKK: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat memuat data.');
+        }
+    }
+    
+    
+    
+    public function tambahAnggota(Request $request, $role, $id)
+    {
+        error_log("datakuu: " . $id);
+
+        try {
+            // Ambil detail kelompok keahlian
+            $kelompok = DB::table('pknow_mskelompokkeahlian as kk')
+                ->leftJoin('sia_msprodi as pro', 'kk.pro_id', '=', 'pro.pro_id')
+                ->leftJoin('ERP_PolmanAstra.dbo.ess_mskaryawan as kry', 'kk.kry_id', '=', 'kry.kry_id')
+                ->select(
+                    'kk.kke_id',
+                    'kk.kke_nama',
+                    'kk.kke_deskripsi',
+                    'kk.kke_gambar',
+                    'kk.kke_status',
+                    'pro.pro_nama as Prodi',
+                    DB::raw("ISNULL(CONCAT(kry.kry_nama_depan, ' ', kry.kry_nama_blkg), 'Tidak Ditemukan') as PIC")
+                )
+                ->where('kk.kke_id', $id)
+                ->first();
+    
+            if (!$kelompok) {
+                return back()->with('error', 'Data tidak ditemukan.');
+            }
+    
+            $kke_id = $id;
+            $search = $request->input('search', '') !== null ? $request->input('search', '') : ''; // Pencarian
+            $filterProdi = $request->input('prodi', '0'); // Filter Prodi
+            $filterStatus = $request->input('status', 'Aktif'); 
+            error_log("id prodi: " . $filterProdi);
+            // Ambil daftar anggota
+            $paramsAnggota = [
+                1, // Page
+                $search, // Query untuk pencarian anggota
+                '[Nama Anggota] ASC', // Urutan anggota
+                $filterStatus, // Status
+                $kke_id, // ID Kelompok Keahlian
+                ...array_fill(5, 45, null)
+            ];
+            error_log('Anott List: ' . json_encode($paramsAnggota));
+            error_log("Search Value: " . ($search === '' ? 'EMPTY STRING' : 'NULL or VALUE: ' . $search));
+            $anggota = DB::select('EXEC pknow_getListAnggotaKeahlian ' . implode(', ', array_fill(0, 50, '?')), $paramsAnggota);
+    
+            if (isset($anggota[0]->Message) && $anggota[0]->Message === 'data kosong') {
+                $anggota = [];
+            }
+            
+            // Ambil daftar dosen dengan filter pencarian dan prodi
+            $paramsDosen = [ // Query pencarian dosen
+                $filterProdi, // Filter berdasarkan prodi
+                '', '', '', ...array_fill(4, 46, null)
+            ];
+
+           
+
+            $dosen = collect(DB::select('EXEC pknow_getListDosen ' . implode(', ', array_fill(0, 50, '?')), $paramsDosen));
+            // ->filter(function ($item) use ($filterProdi) {
+            //     return !$filterProdi || $item->Prodi === $filterProdi; // Hanya tampilkan yang sesuai prodi
+            // });
+
+            // Ambil daftar prodi untuk dropdown filter
+            $prodiList = DB::select('EXEC pknow_getListProdi ' . implode(', ', array_fill(0, 50, '?')), array_fill(0, 50, null));
+            // error_log('Prodi List: ' . json_encode($prodiList));
+            $prodiList = collect($prodiList)->map(function ($item) {
+                return [
+                    'Value' => $item->Value, // Ini `pro_id`
+                    'Text' => $item->Text,   // Ini `pro_nama`
+                ];
+            });
+            
+            return view('page.master-pic-pknow.KelolaAKK.TambahAKK', compact('kelompok', 'anggota', 'dosen', 'prodiList', 'kke_id', 'role'));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+    
+    
+    
+    public function addAnggota(Request $request)
+    {
+        $usr_id = Cookie::get('usr_id');
+        if (!$usr_id) {
+            return redirect()->route('login')->with('error', 'User tidak ditemukan. Silakan login kembali.');
         }
     
-        // Render view untuk menampilkan data
-        return view('page.master-prodi.KelolaKK.LihatKK', compact('data'));
+        try {
+            // Eksekusi SP untuk menambahkan anggota
+            $params = [
+                $request->kke_id, // ID Kelompok Keahlian
+                $request->kry_id, // ID Karyawan
+                $usr_id,          // User ID (PIC)
+                ...array_fill(3, 47, null)
+            ];
+            error_log('Parameters to SP: ' . json_encode($params));
+    
+            // Eksekusi stored procedure
+            $result = DB::select('EXEC pknow_createAnggotaByPIC ' . implode(', ', array_fill(0, 50, '?')), $params);
+    
+            error_log('Result from SP: ' . json_encode($result));
+    
+            return redirect()->route('kelola_anggota', ['role' => $request->role, 'id' => $request->kke_id])
+            ->with('success', 'Anggota berhasil ditambahkan.');
+    
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
     
 
+    public function deleteAnggota(Request $request, $id)
+    {
+        $usr_id = Cookie::get('usr_id');
+        if (!$usr_id) {
+            return redirect()->route('login')->with('error', 'User tidak ditemukan. Silakan login kembali.');
+        }
+    
+        try {
+            $params = [
+                $id,           // ID Anggota
+                'Dibatalkan',  // Status baru
+                $usr_id,       // ID User yang menghapus
+                ...array_fill(3, 47, null)
+            ];
+            error_log('Delete Anggota Params: ' . json_encode($params));
+    
+            // Eksekusi stored procedure untuk menghapus anggota
+            $result = DB::select('EXEC pknow_setStatusAnggotaKeahlian ' . implode(', ', array_fill(0, 50, '?')), $params);
+    
+            // Log hasil eksekusi stored procedure
+            error_log('Delete Anggota Result: ' . json_encode($result));
+    
+            return redirect()->route('kelola_anggota', ['role' => $request->role, 'id' => $request->kke_id])
+            ->with('success', 'Anggota berhasil dihapus.');
+        } catch (\Exception $e) {
+            error_log('Error di Delete Anggota: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+    
 }

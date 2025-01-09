@@ -83,10 +83,9 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{ $item->NamaKelompokKeahlian }}</h5>
                                 <p class="card-text">{{ $item->Deskripsi }}</p>
-                                <button class="btn btn-info btn-sm" onclick="viewDetail('{{ $item->KeyId }}')">
-                                    <i class="fas fa-eye"></i> Lihat
-                                </button>
-
+                                <button class="btn btn-info btn-sm" onclick="viewDetail('{{ $role }}', '{{ $item->KeyId }}')">
+    <i class="fas fa-eye"></i> Lihat
+</button>
 
                             </div>
                         </div>
@@ -106,8 +105,8 @@
         window.location.href = `/prodi/edit-pic/${id}`;
     }
 
-    function viewDetail(id) {
-    window.location.href = `/prodi/lihatKK/${id}`;
+    function viewDetail(role, id) {
+    window.location.href = `/kelola_kk/${role}/detail/${id}`;
 }
 
 
