@@ -78,7 +78,7 @@
                     <p>Dokumen PowerPoint tidak dapat ditampilkan langsung. Silakan unduh file untuk melihatnya.</p>
                     <a href="{{ asset($data->pus_file) }}" class="btn btn-primary" download>Unduh File</a>
                     @else
-                    <!-- File Tidak Didukung -->
+                    <!-- File Tidak Didukung s-->
                     <p>File dengan format {{ $fileExtension }} tidak didukung untuk preview. Silakan unduh file untuk melihatnya.</p>
                     <a href="{{ asset($data->pus_file) }}" class="btn btn-primary" download>Unduh File</a>
                     @endif

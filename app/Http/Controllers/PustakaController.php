@@ -472,7 +472,7 @@ class PustakaController extends Controller
             return response()->json([
                 'error' => 'Terjadi kesalahan saat mengambil data.',
                 'details' => $e->getMessage()
-            ], 500);
+            ], 500);//
         }
     }
 }

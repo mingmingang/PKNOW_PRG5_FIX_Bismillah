@@ -117,6 +117,6 @@
             document.getElementById('imagePreview').src = reader.result;
         };
         reader.readAsDataURL(event.target.files[0]);
-    }
+    }//
 </script>
 
