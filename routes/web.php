@@ -5,8 +5,10 @@ use App\Http\Controllers\LoginController;
 
 use App\Http\Controllers\BerandaProdiController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\HeaderController;
 use App\Http\Controllers\KKController;
+use App\Http\Controllers\PustakaController;
 
 Route::get('/', function(){
     return view('page/login/index');
@@ -21,15 +23,8 @@ Route::get('/login', function () {
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/logout', [LoginController::class, 'clearRoleSession'])->name('clearRoleSession');
 
-Route::middleware(['web'])->group(function () {
-    Route::get('/captcha.php', function () {
-        include base_path('captcha.php');
-        exit;
-    });
-
-    Route::post('/login', [LoginController::class, 'login'])->name('login');
-});
-
+Route::get('/captcha', [CaptchaController::class, 'generate'])->name('captcha.generate');
+Route::post('/captcha/validate', [CaptchaController::class, 'validateCaptcha'])->name('captcha.validate');
 
 // ----------------------------------------------------  Return View  ----------------------------------------------------
 // ----------- Beranda View -----------  
@@ -56,6 +51,16 @@ Route::post('/kelola_kk/toggleStatus', [KKController::class, 'toggleStatus'])->n
 Route::get('/get-list-karyawan', [KKController::class, 'getListKaryawan'])->name('kelola_kk.getKaryawan');
 Route::delete('/kelola_kk/deleteKK/{id}', [KKController::class, 'deleteKelompokKeahlian'])->name('kelola_kk.delete');
 
+Route::get('/daftar_pustaka/{role}', [PustakaController::class, 'getTempDataPustaka'])->name('daftar_pustaka');
+Route::post('/daftar_pustaka/tambah', [PustakaController::class, 'store'])->name('daftar_pustaka.store');
+Route::get('/daftar_pustaka/{role}/tambah', [PustakaController::class, 'create'])->name('daftar_pustaka.create');
+Route::get('/daftar_pustaka/{role}/edit/{id}', [PustakaController::class, 'edit'])->name('daftar_pustaka.edit');
+Route::put('/daftar_pustaka/{id}', [PustakaController::class, 'update'])->name('daftar_pustaka.update');
+Route::get('/daftar_pustaka/{role}/lihat/{id}', [PustakaController::class, 'lihat'])->name('daftar_pustaka.lihat');
+Route::delete('/daftar_pustaka/deletePustaka/{id}', [PustakaController::class, 'deleteDaftarPustaka'])->name('daftar_pustaka.delete');
+Route::put('/daftar_pustaka/setStatusPustaka/{id}', [PustakaController::class, 'setStatusPustaka'])->name('daftar_pustaka.setStatusPustaka');
+Route::post('/daftar_pustaka/{role}/search', [PustakaController::class, 'search'])->name('daftar_pustaka.search');
+
 Route::get('/beranda_pengguna', function () {
     return view('Backbone/BerandaPengguna');
 });
@@ -80,14 +85,18 @@ Route::get('/dashboard/Mahasiswa', function () {
     return view('Backbone/BerandaMahasiswa');
 });
 
-
-
 Route::get('/pickk', function () {
     return view('page/master-pic-kk/index');
 });
 
 Route::get('/tenaga_kependidikan', function () {
     return view('page/master-tenaga-kependidikan/index');
+});
+
+Route::prefix('prodi')->group(function () {
+    Route::get('kelola_pic', [KKController::class, 'kelolaPICIndex'])->name('kelola.pic');
+    Route::get('edit-pic/{id}', [KKController::class, 'kelolaPICEdit'])->name('edit.pic');
+    Route::put('edit-pic/{id}', [KKController::class, 'kelolaPICUpdate'])->name('update.pic');
 });
 
 Route::get('/header', [HeaderController::class, 'index']);

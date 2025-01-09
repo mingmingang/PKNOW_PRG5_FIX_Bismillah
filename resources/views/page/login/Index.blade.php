@@ -45,13 +45,13 @@
                     <input type="text" class="login-input" name="username" placeholder="Nama Pengguna" required>
                     <input type="password" class="login-input" name="password" placeholder="Kata Sandi" required>
                     <div class="d-flex justify-content-between mt-3">
-                    <img src="{{ url('captcha.php') }}?rand={{ rand() }}" id="captcha_image">
-                    <div class="mt-0">
-                    <input type="text" name="captcha" class="login-input ml-3 mt-2" required placeholder="Masukan Captcha">
-                    </div>
-                    <p class="mt-3">
-                        <a href='javascript: refreshCaptcha();'><i class="fas fa-sync-alt  mr-3"></i></a>
-                    </p>
+                        <img src="{{ route('captcha.generate') }}?rand={{ rand() }}" id="captcha_image">
+                        <div class="mt-0">
+                            <input type="text" name="captcha" class="login-input ml-3 mt-2" required placeholder="Masukan Captcha">
+                        </div>
+                        <p class="mt-3">
+                            <a href="javascript: refreshCaptcha();"><i class="fas fa-sync-alt mr-3"></i></a>
+                        </p>
                     </div>
                     
                     
@@ -134,11 +134,10 @@
 
 <script>
 //Refresh Captcha
-function refreshCaptcha(){
-    var img = document.images['captcha_image'];
-    img.src = img.src.split('?')[0] + "?rand=" + Math.random() * 1000;
-}
-
+function refreshCaptcha() {
+        var img = document.images['captcha_image'];
+        img.src = img.src.split('?')[0] + "?rand=" + Math.random() * 1000;
+    }
 </script>
 
 

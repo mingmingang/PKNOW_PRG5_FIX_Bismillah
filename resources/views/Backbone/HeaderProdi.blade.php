@@ -34,7 +34,7 @@
         </a>
         <ul class="dropdown-content">
           <li>
-            <a onclick="handleKelolaKK()">
+            <a onclick="handlePICKK()">
             <i class="fas fa-cogs"></i>
               <span>PIC Kelompok Keahlian</span>
             </a>
@@ -129,8 +129,8 @@
     </nav>
 </body>
 <script>
-function handleKelolaKK() {
-        window.location.href = `/kelola_kk`;
+function handlePICKK() {
+  window.location.href = `/prodi/kelola_pic`;
 }
 
 function handleBeranda() {

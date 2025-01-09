@@ -25,15 +25,14 @@ class LoginController extends Controller
         $input = $request->input('username'); 
 
         $inputCaptcha = $request->input('captcha');
+        Log::info("Input Captcha: $inputCaptcha");
         $sessionCaptcha = session('captcha');
+        Log::info("Session Captcha: $sessionCaptcha");
 
-    // Debugging untuk memastikan session tersedia
-        error_log("Input Captcha: $inputCaptcha");
-        error_log("Session Captcha: $sessionCaptcha");
-
-        // if ($inputCaptcha !== $sessionCaptcha) {
-        //     return back()->with('error', 'Captcha tidak valid.');
-        // }
+        // Validasi captcha
+        if ($inputCaptcha !== $sessionCaptcha) {
+            return back()->with('error', 'Captcha tidak valid.');
+        }
         // contoh inputan user
         
         // Memanggil stored procedure dengan parameter

@@ -40,7 +40,7 @@
             </a>
           </li>
           <li>
-            <a href="#sub2">
+            <a onclick="handleKelolaAKK()">
             <i class="fas fa-users"></i>
               <span>Kelola Anggota</span>
             </a>
@@ -139,6 +139,14 @@ function handleBeranda() {
         window.location.href = `/dashboard/${role}`;
 }
 
+function handleKelolaAKK() {
+  const role = "{{ Cookie::get('role') }}";
+  if (!role) {
+    alert('Role tidak ditemukan!');
+    return;
+  }
+  window.location.href = `/kelola_akk/${role}`;
+}
 
 
   function showDropdown() {

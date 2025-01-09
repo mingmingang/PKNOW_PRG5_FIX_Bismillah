@@ -1,79 +1,88 @@
-@extends('layouts.app')
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ asset('css/Beranda.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/Search.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Kelola Anggota Kelompok Keahlian - P-KNOW</title>
+</head>
 
-@section('content')
-    <div class="app-container">
-        <!-- Header -->
-        @include('backbone.header', [
-            'showMenu' => true,
-            'dropdownContent' => [
-                ['title' => 'Kelola Kelompok Keahlian', 'icon' => 'fas fa-cogs'],
-                ['title' => 'Kelola Anggota', 'icon' => 'fas fa-users'],
-                ['title' => 'Daftar Pustaka', 'icon' => 'fas fa-book']
-            ],
-            'userProfile' => [
-                'name' => 'Budi Hartono',
-                'role' => 'PIC P-KNOW',
-                'lastLogin' => now()->format('l, d F Y H:i'),
-                'photo' => asset('assets/fotobudi.png')
-            ],
-            'menuItems' => ['beranda', 'knowledge-database', 'i-learning']
-        ])
+@include('backbone.headerpicpknow', [
+    'showMenu' => true,
+    'userProfile' => ['name' => 'User', 'role' => 'PIC P-KNOW', 'lastLogin' => 'Terakhir Masuk: ' . now()],
+])
 
-        <main>
-            <!-- Search Section -->
-            @include('part.search', [
-                'title' => 'Kelola Anggota',
-                'description' => 'P-KNOW System dapat mengatur hak akses anggota yang terdaftar di sistem KMS ASTRAtech.',
-                'placeholder' => 'Cari Anggota'
-            ])
-
-            <div class="navigasi-layout-page">
-                <p class="title-kk">Kelompok Keahlian</p>
-                <div class="left-feature">
-                    <div class="status">
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td><i class="fas fa-circle" style="color: #4a90e2;"></i></td>
-                                    <td><p>Aktif/Sudah Publikasi</p></td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-circle" style="color: #b0b0b0;"></i></td>
-                                    <td><p>Menunggu PIC dari Prodi</p></td>
-                                </tr>
-                            </tbody>
-                        </table>
+<div class="backSearch">
+    <h1>Kelola Kelompok Keahlian</h1>
+    <p>ASTRAtech memiliki banyak program studi, di dalam program studi terdapat kelompok keahlian yang biasa disebut dengan Kelompok Keahlian.</p>
+    <div class="input-wrapper search d-flex">
+        <div class="d-flex" style="background:white; padding:0px 0px;justify-content:space-between;border-radius:30px;">
+            <input 
+                type="text" 
+                id="searchQuery" 
+                placeholder="Cari Kelompok Keahlian" 
+                value="{{ request('query') }}" 
+                style="width:600px; padding:10px; border:none; border-radius:30px">
+            <button 
+                class="search-btn" 
+                onclick="handleSearch()" 
+                style="border:none; background:transparent; color:blue; margin:10px;">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+</div>
+<div class="container mt-5">
+    <h3 class="text-primary mb-3">Kelompok Keahlian</h3>
+    <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5>↓ Data Aktif</h5>
+            </div>
+        </div>
+    <div class="row mt-3">
+        @forelse ($data as $item)
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{{ $item->{'Gambar'} ? asset($item->{'Gambar'}) : asset('default.jpg') }}" 
+                         class="card-img-top" 
+                         alt="{{ $item->{'Nama Kelompok Keahlian'} }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ $item->{'Nama Kelompok Keahlian'} }}</h5>
+                        <p class="card-text"><i class="fas fa-user"></i> PIC: {{ $item->{'PIC'} ?? 'Belum Ditentukan' }}</p>
+                        <p class="card-text">
+                            {{ Str::limit($item->{'Deskripsi'}, 100) }} <!-- Batas karakter deskripsi -->
+                        </p>
+                        <button class="btn btn-primary btn-sm" onclick="kelolaAnggota('{{ $item->{'Key'} }}')">
+                            <i class="fas fa-users"></i> Kelola Anggota
+                        </button>
                     </div>
                 </div>
             </div>
-
-            <!-- Kelompok Keahlian -->
-            <div class="kelompok-keahlian-container">
-                @foreach ([
-                    ['title' => 'Android Developer', 'program' => 'Informatics Management', 'pic' => 'Kevin Trikusuma Dewa', 'description' => 'Android developers create applications for smartphones or tablets.', 'statusText' => 'Aktif/Sudah Publikasi', 'image' => asset('assets/developer.png')],
-                    ['title' => 'Web Developer', 'program' => 'Computer Science', 'pic' => 'John Doe', 'description' => 'Web developers build and maintain websites.', 'statusText' => 'Aktif/Sudah Publikasi', 'image' => asset('assets/developer.png')],
-                    ['title' => 'Data Scientist', 'program' => 'Data Science', 'pic' => 'Jane Smith', 'description' => 'Data scientists analyze complex data to help organizations make better decisions.', 'statusText' => 'Aktif/Sudah Publikasi', 'image' => asset('assets/developer.png')]
-                ] as $kelompok)
-                    <div class="kelompok-keahlian-item">
-                        @include('part.kelompok-keahlian', [
-                            'image' => $kelompok['image'],
-                            'title' => $kelompok['title'],
-                            'program' => $kelompok['program'],
-                            'pic' => $kelompok['pic'],
-                            'description' => $kelompok['description'],
-                            'statusImage' => asset('assets/aktif.png'),
-                            'statusText' => $kelompok['statusText'],
-                            'buttonText' => 'Kelola Anggota',
-                            'iconClass' => 'fas fa-user',
-                            'onClick' => 'window.location.href = "/kelola-daftar-anggota-keahlian";',
-                            'showDropdown' => false
-                        ])
-                    </div>
-                @endforeach
-            </div>
-        </main>
-
-        <!-- Footer -->
-        @include('backbone.footer')
+        @empty
+            <p class="text-center">Tidak ada data.</p>
+        @endforelse
     </div>
-@endsection
+</div>
+
+
+
+@include('backbone.footer')
+
+<script>
+function handleSearch() {
+    const query = document.getElementById('searchQuery').value.trim();
+    const url = query ? `?query=${encodeURIComponent(query)}` : `?query=`;
+    window.location.href = url;
+}
+function kelolaAnggota(id) {
+    const role = "{{ urlencode(Cookie::get('role')) }}"; // Pastikan role diambil dengan benar dan di-encode
+    const url = `/kelola_akk/${role}/anggota/${id}`;
+    console.log(url); // Debug untuk melihat URL yang dihasilkan
+    window.location.href = url;
+}
+
+</script>

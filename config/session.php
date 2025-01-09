@@ -18,8 +18,8 @@ return [
     |
     */
 
-    // 'driver' => env('SESSION_DRIVER', 'database'),
-    'driver' => 'file',
+    'driver' => env('SESSION_DRIVER', 'database'), // Pastikan sesuai
+
 
     /*
     |--------------------------------------------------------------------------
