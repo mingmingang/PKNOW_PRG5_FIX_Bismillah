@@ -15,7 +15,7 @@
     'pesanKonfirmasi' => 'Apakah Anda yakin ingin keluar?',
     'kelolaProgram' => false,
     'showConfirmation' => false,
-])
+]) 
 <div class="container" style="margin-top: 100px;">
     <div class="row">
         <div class="col-12">

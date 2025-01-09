@@ -37,7 +37,7 @@
                                 <label class="form-label"><strong>PIC:</strong> {{ $data->pic_nama }}</label><br>
                                 <label class="form-label"><strong>Deskripsi:</strong> {{ $data->kke_deskripsi }}</label>
                             </div>
-
+ 
                             <!-- Daftar Program yang Aktif -->
                             <div class="col-12 mt-4">
                                 <h5>Daftar Program dalam Kelompok Keahlian {{ $data->kke_nama }}</h5>

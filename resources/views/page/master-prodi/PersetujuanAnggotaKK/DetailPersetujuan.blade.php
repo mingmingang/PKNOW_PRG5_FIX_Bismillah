@@ -65,7 +65,7 @@
             <button type="button" class="btn btn-info btn-sm" onclick="lihatLampiran('{{ $anggota->akk_id }}', '{{ $anggota->nama }}', '{{ $data->pro_nama }}')">
     Detail
 </button>
-
+ 
                 <!-- Tombol Setujui -->
                 <form action="{{ route('persetujuan.updateStatus') }}" method="POST" style="display: inline;">
                     @csrf

@@ -77,7 +77,7 @@ class PengajuanKKController extends Controller
             ], 500);
         }
     }
-
+ 
     public function gabung(Request $request, $role, $id)
     {
         $data = DB::table('pknow_mskelompokkeahlian as kk')

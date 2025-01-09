@@ -165,7 +165,7 @@ return view('page.master-prodi.PersetujuanAnggotaKK.DetailPersetujuan', compact(
     
        
     }
-
+ 
 
 
     public function create(Request $request)
