@@ -141,7 +141,10 @@
         .then(data => {
             if (data.success && data.data.length > 0) {
                 const lampiranHTML = data.data.map(item => {
-                    return `<a href="/${item.Lampiran}" target="_blank">${item.Lampiran}</a>`;
+                    // Render setiap file dalam lampiran
+                    return item.Lampiran.map(file => {
+                        return `<a href="/${file}" target="_blank">${file}</a>`;
+                    }).join('<br>');
                 }).join('<br>');
                 document.getElementById('lampiran-pengajuan').innerHTML = lampiranHTML;
             } else {
@@ -152,6 +155,7 @@
             console.error('Error:', error);
             document.getElementById('lampiran-pengajuan').textContent = 'Terjadi kesalahan saat memuat lampiran.';
         });
+
 }
 
 </script>

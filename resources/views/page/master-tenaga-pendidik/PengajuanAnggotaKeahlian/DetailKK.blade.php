@@ -16,31 +16,59 @@
     'kelolaProgram' => false,
     'showConfirmation' => false,
 ])
-<div class="container" style="margin-top: 100px;">
+<div style="display: flex; justify-content: space-between; margin-top: 100px; margin-left: 70px; margin-right: 70px;">
+    <div class="back-and-title" style="display: flex;">
+        <button style="background-color: transparent; border: none;" onclick="BackPage()">
+            <img src="{{ asset('assets/backPage.png') }}" alt="" />
+        </button>
+        <h4 style="color: rgb(10, 94, 168); font-weight: bold; font-size: 30px; margin-top: 10px; margin-left: 20px;">
+            Detail Kelompok Keahlian
+        </h4>
+    </div>
+    
+</div>
+<div class="card" style="margin: 80px; 80px; margin-top: 30px;">
     <div class="row">
         <div class="col-12">
-            <h4>Detail Kelompok Keahlian</h4>
-        </div>
-
-        <div class="col-12">
+        
             <form>
                 @csrf
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="row">
-                            <!-- Detail Kelompok Keahlian -->
-                            <div class="col-lg-6">
-                                <label class="form-label"><strong>Nama Kelompok Keahlian:</strong>
-                                    {{ $data->kke_nama }}</label><br>
-                                     <label class="form-label"><strong>Program Studi:</strong>
-                                    {{ $data->pro_nama }}</label><br>
-                                <label class="form-label"><strong>PIC:</strong> {{ $data->pic_nama }}</label><br>
-                                <label class="form-label"><strong>Deskripsi:</strong> {{ $data->kke_deskripsi }}</label>
+                <div class="card-body p-4">
+                    <div class="row pt-2">
+                        <div class="col-lg-7 px-4">
+                            <h3 class="mb-3 fw-semibold">{{ $data->kke_nama }}</h3>
+                            <h6 class="fw-semibold">
+                                <span class="bg-primary me-2" style="padding: 2px;"></span>
+                                {{ $data->pro_nama }}
+                            </h6>
+                            <div class="pt-2 ps-2">
+                                <i class="fa fa-user text-dark"></i>
+                                <span>PIC:{{ $data->pic_nama }}</span>
                             </div>
- 
+                            <hr class="mb-0" style="opacity: 0.2;">
+                            <p class="py-3" style="text-align: justify;">{{ $data->kke_deskripsi }}</p>
+                        </div>
+
+                        <div class="col-lg-5">
+                            @if ($anggotaAktif->isEmpty())
+                                <p>Tidak ada anggota aktif.</p>
+                            @else
+                                <ul class="list-group">
+                                    @foreach ($anggotaAktif as $anggota)
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span>{{ $anggota->nama }}</span>
+                                           
+                                            
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+
+                        <div>
                             <!-- Daftar Program yang Aktif -->
                             <div class="col-12 mt-4">
-                                <h5>Daftar Program dalam Kelompok Keahlian {{ $data->kke_nama }}</h5>
+                                <h5 class="text-primary">Daftar Program dalam Kelompok Keahlian {{ $data->kke_nama }}</h5>
                                 @if (empty($listProgramWithKategori))
                                     <p>Tidak ada program yang aktif.</p>
                                 @else
@@ -73,6 +101,7 @@
                                                                         </h6>
                                                                         <p class="card-text"
                                                                             style="text-align: justify;">
+                                                                           
                                                                             {{ $kategori->Deskripsi }}
                                                                         </p>
                                                                     </div>
@@ -100,4 +129,9 @@
     console.log(@json($listProgramWithKategori));
 </script>
 
+<script>
+    function BackPage() {
+        window.location.href = "{{ route('pengajuan_KK') }}";
+    }
+</script>
 @include('backbone.footer')

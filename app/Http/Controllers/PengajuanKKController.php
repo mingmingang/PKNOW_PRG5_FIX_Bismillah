@@ -34,14 +34,13 @@ class PengajuanKKController extends Controller
         return view('page.master-tenaga-pendidik.PengajuanAnggotaKeahlian.PengajuanAnggotaKeahlian', compact('dataFilterSort', 'dataFilterStatus', 'roles'));
     }
 
-
     public function getTempDataKK(Request $request)
     {
         $dataFilterSort = [
             ['Value' => '[Nama Kelompok Keahlian] asc', 'Text' => 'Nama Kelompok Keahlian [↑]'],
             ['Value' => '[Nama Kelompok Keahlian] desc', 'Text' => 'Nama Kelompok Keahlian [↓]'],
         ];
-
+    
         $dataFilterStatus = [
             ['Value' => '', 'Text' => 'Semua'],
             ['Value' => 'Menunggu', 'Text' => 'Menunggu PIC Prodi'],
@@ -49,26 +48,61 @@ class PengajuanKKController extends Controller
             ['Value' => 'Aktif', 'Text' => 'Aktif'],
             ['Value' => 'Tidak Aktif', 'Text' => 'Tidak Aktif'],
         ];
-
-        $params = [
-            $request->input('page', 1),                // @p1: Halaman saat ini
-            $request->input('query', ''),             // @p2: Filter "Nama Kelompok Keahlian"
-            $request->input('sort', '[Nama Kelompok Keahlian] ASC'), // @p3: Urutan
-            $request->input('status', 'Aktif'),            // @p4: Filter status
-            '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
-        ];
-
+    
+        // Ambil user ID dari cookies
+        $usr_id = Cookie::get('usr_id');
+        if (!$usr_id) {
+            return response()->json([
+                'error' => 'User ID tidak ditemukan di cookies.',
+            ], 400);
+        }
+    
         try {
-            // Panggil stored procedure
-            $data = DB::select('EXEC pknow_getTempDataKelompokKeahlian ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', $params);
-
+            // Panggil stored procedure `pknow_getDataUserLogin` untuk mendapatkan kry_id
+            $userData = DB::select('EXEC pknow_getDataUserLogin ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', [
+                $usr_id,
+                ...array_fill(1, 49, null), // Sisa parameter diisi null
+            ]);
+    
+            if (empty($userData) || !isset($userData[0]->kry_id)) {
+                throw new \Exception('Data user tidak ditemukan atau tidak valid.');
+            }
+    
+            $kry_id = $userData[0]->kry_id;
+    
+            // Siapkan parameter untuk `pknow_getDataAnggotaKeahlian`
+            $params = [
+                $request->input('page', 1),                // @p1: Halaman saat ini
+                $request->input('query', ''),             // @p2: Filter "Nama Kelompok Keahlian"
+                $request->input('sort', '[Nama Kelompok Keahlian] ASC'), // @p3: Urutan
+                $kry_id,                                  // @p4: kry_id dari user
+                ...array_fill(4, 46, null),               // Sisa parameter diisi null
+            ];
+    
+            // Panggil stored procedure `pknow_getDataAnggotaKeahlian`
+            $data = DB::select('EXEC pknow_getDataAnggotaKeahlian ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', $params);
+    
             // Jika hasil kosong
             if (count($data) === 0) {
-                // return response()->json(['message' => 'Tidak ada data.'], 404);
                 return view('page.master-tenaga-pendidik.PengajuanAnggotaKeahlian.PengajuanAnggotaKeahlian', compact('dataFilterSort', 'dataFilterStatus'))->with('data', $data);
             }
 
-            // Return hasil sebagai JSON
+            // Tambahkan data lampiran untuk setiap item
+        // Tambahkan data lampiran untuk setiap item
+foreach ($data as &$item) {
+    $lampiran = DB::table('pknow_mslampirananggotakeahlian')
+        ->select('lak_lampiran')
+        ->where('akk_id', $item->Key)
+        ->get()
+        ->pluck('lak_lampiran')
+        ->toArray();
+
+    // Gabungkan lampiran menjadi string, lalu pecah menjadi array
+    $item->Lampiran = !empty($lampiran) ? explode(',', implode(',', $lampiran)) : [];
+}
+
+    
+            // Return hasil ke view
             return view('page.master-tenaga-pendidik.PengajuanAnggotaKeahlian.PengajuanAnggotaKeahlian', compact('dataFilterSort', 'dataFilterStatus'))->with('data', $data);
         } catch (\Exception $e) {
             return response()->json([
@@ -77,6 +111,7 @@ class PengajuanKKController extends Controller
             ], 500);
         }
     }
+    
  
     public function gabung(Request $request, $role, $id)
     {
@@ -93,6 +128,39 @@ class PengajuanKKController extends Controller
     
         return view('page.master-tenaga-pendidik.PengajuanAnggotaKeahlian.GabungKelompokKeahlian', compact('data', 'role'));
     }
+    public function detail(Request $request, $role, $akk_id)
+    {
+        $detailData = DB::table('pknow_msanggotakeahlian as akk')
+            ->join('pknow_mskelompokkeahlian as kk', 'akk.kke_id', '=', 'kk.kke_id')
+            ->select(
+                'akk.akk_id',
+                'kk.kke_id',
+                'kk.kke_nama',
+                'akk.kry_id',
+                'akk.akk_status'
+            )
+            ->where('akk.akk_id', $akk_id)
+            ->first();
+    
+        if (!$detailData) {
+            return redirect()->route('pengajuan_kk', ['role' => urlencode($role)])
+                ->with('error', 'Detail data tidak ditemukan.');
+        }
+    
+        // Ambil lampiran dan pecah menjadi array
+        $lampiran = DB::table('pknow_mslampirananggotakeahlian')
+            ->select('lak_lampiran')
+            ->where('akk_id', $akk_id)
+            ->get()
+            ->pluck('lak_lampiran')
+            ->toArray();
+    
+        // Gabungkan semua lampiran menjadi array terpisah
+        $detailData->Lampiran = !empty($lampiran) ? explode(',', implode(',', $lampiran)) : [];
+    
+        return view('page.master-tenaga-pendidik.PengajuanAnggotaKeahlian.Detail', compact('detailData', 'role'));
+    }
+    
 
     public function toggleStatus(Request $request)
     {
@@ -164,14 +232,18 @@ class PengajuanKKController extends Controller
         $created_by = $usr_id; // Creator user ID
 
         // Upload lampiran
-        $lampiranPath = null;
+        $lampiranPaths = [];
         if ($request->hasFile('lampiran')) {
-            $file = $request->file('lampiran')[0];
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $destinationPath = public_path('file');
-            $file->move($destinationPath, $fileName);
-            $lampiranPath = 'file/' . $fileName;
+            foreach ($request->file('lampiran') as $file) {
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $destinationPath = public_path('file');
+                $file->move($destinationPath, $fileName);
+                $lampiranPaths[] = 'file/' . $fileName;
+            }
         }
+
+        // Gabungkan semua jalur lampiran dengan koma
+        $lampiranPathString = implode(',', $lampiranPaths);
 
         // Panggil stored procedure
         $result = DB::select('EXEC pknow_createAnggotaKeahlian ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', [
@@ -179,13 +251,13 @@ class PengajuanKKController extends Controller
             $kry_id,     // @p2: kry_id
             $status,     // @p3: akk_status
             $created_by, // @p4: akk_created_by
-            $lampiranPath, // @p5: lampiran
+            $lampiranPathString, // @p5: lampiran (string dipisahkan koma)
             ...array_fill(5, 45, null), // Sisa parameter diisi null
         ]);
 
         // Handle hasil
         if (!empty($result) && isset($result[0]->hasil)) {
-            return redirect()->route('pengajuan_kk')->with('success', 'Pengajuan berhasil dikirim!');
+            return redirect()->route('pengajuan_KK')->with('success', 'Pengajuan berhasil dikirim!');
         } else {
             throw new \Exception('Gagal menyimpan data pengajuan.');
         }
@@ -193,6 +265,7 @@ class PengajuanKKController extends Controller
         return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
     }
 }
+
 
 public function detailKK(Request $request, $role, $id)
 {
@@ -270,9 +343,21 @@ public function detailKK(Request $request, $role, $id)
             'kategori' => $listKategori,
         ];
     }
+// Ambil data anggota aktif
+$anggotaAktif = DB::table('pknow_msanggotakeahlian as akk')
+->join('ERP_PolmanAstra.dbo.ess_mskaryawan as kar', 'akk.kry_id', '=', 'kar.kry_id')
+->select(
+    DB::raw("kar.kry_nama_depan + ' ' + kar.kry_nama_blkg as nama"),
+    'akk.akk_id',
+    'akk.akk_status'
+)
+->where('akk.kke_id', $id)
+->where('akk.akk_status', 'Aktif')
+->get();
 
+// Data program dan kategori
     // 6. Kirim data ke view
-    return view('page.master-tenaga-pendidik.PengajuanAnggotaKeahlian.DetailKK', compact('data', 'role', 'listProgramWithKategori'));
+    return view('page.master-tenaga-pendidik.PengajuanAnggotaKeahlian.DetailKK', compact('data', 'role', 'listProgramWithKategori', 'anggotaAktif'));
 }
 
 }

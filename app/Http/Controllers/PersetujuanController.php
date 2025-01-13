@@ -287,23 +287,29 @@ return view('page.master-prodi.PersetujuanAnggotaKK.DetailPersetujuan', compact(
     }
 
     public function getDetailLampiran(Request $request)
-{
-    try {
-        $params = [
-            $request->input('page', 1),       // @p1: Halaman saat ini
-            $request->input('sort', '[ID Lampiran] ASC'), // @p2: Urutkan berdasarkan ID Lampiran
-            $request->input('akk_id', ''),   // @p3: ID Anggota Keahlian
-            ...array_fill(3, 47, null)       // Parameter lainnya diisi NULL
-        ];
-
-        // Panggil stored procedure
-        $data = DB::select('EXEC pknow_getDetailLampiran ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', $params);
-
-        // Kembalikan hasil dalam format JSON
-        return response()->json(['success' => true, 'data' => $data], 200);
-    } catch (\Exception $e) {
-        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+    {
+        try {
+            $params = [
+                $request->input('page', 1),       // @p1: Halaman saat ini
+                $request->input('sort', '[ID Lampiran] ASC'), // @p2: Urutkan berdasarkan ID Lampiran
+                $request->input('akk_id', ''),   // @p3: ID Anggota Keahlian
+                ...array_fill(3, 47, null)       // Parameter lainnya diisi NULL
+            ];
+    
+            // Panggil stored procedure
+            $data = DB::select('EXEC pknow_getDetailLampiran ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', $params);
+    
+            // Proses data untuk memisahkan lampiran dengan tanda koma
+            foreach ($data as $item) {
+                $item->Lampiran = explode(',', $item->Lampiran); // Ubah string menjadi array
+            }
+    
+            // Kembalikan hasil dalam format JSON
+            return response()->json(['success' => true, 'data' => $data], 200);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
-}
+    
 
 }
