@@ -32,9 +32,7 @@
         @endif
 
         <div class="col-12">
-            <form action="{{ route('kelola_kk.store') }}" method="POST" enctype="multipart/form-data" id="formId">
-
-            
+        <form action="" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-3">
                     <label for="nama" class="form-label">Nama Kelompok Keahlian (Maksimal 25 Huruf)</label> <span style="color: red;">*</span>
@@ -101,14 +99,29 @@
     const listKaryawan = @json($listKaryawan);
     console.log("List Karyawan:", listKaryawan);
 
-    const roles = @json($roles);
-    console.log("List roles:", roles);
+function handleSubmit() {
+    // Ambil role dari cookie
+    const role = "{{ Cookie::get('role') }}";
+
+    // Validasi apakah role tersedia
+    if (!role) {
+        console.error("Role is missing. Cannot navigate to the add page.");
+        Swal.fire("Error", "Role tidak ditemukan. Silakan login ulang.", "error");
+        return;
+    }
+
+    // Navigasi ke halaman Tambah berdasarkan role
+    const url = `/kelola_kk/${role}/tambah`;
+    console.log("Navigating to:", url);
+    window.location.href = url;
+}
 </script>
 
 <script>
+
     const urlParams = new URLSearchParams(window.location.search);
-    const role = urlParams.get('role');
-    const pengguna = urlParams.get('pengguna');
+    const role = "{{ Cookie::get('role') }}";
+    const pengguna = "{{ Cookie::get('pengguna') }}";
 
     const usrId = "{{ Cookie::get('usr_id') }}";
     console.log('usr_id dari cookie:', usrId);

@@ -39,21 +39,26 @@
                 <option value="{{ $sort['Value'] }}">{{ $sort['Text'] }}</option>
             @endforeach
         </select>
-    </div>
-    <div class="col-md-3">
-        <label for="searchFilterStatus">Status</label>
-        <select id="searchFilterStatus" class="form-select">
-    @foreach($dataFilterStatus as $status)
-        <option value="{{ $status['Value'] }}">{{ $status['Text'] }}</option>
-    @endforeach
-</select>
-
+            </div>
+            <div class="col-md-3">
+                <label for="searchFilterStatus">Status</label>
+                <select id="searchFilterStatus" class="form-select">
+            @foreach($dataFilterStatus as $status)
+                <option value="{{ $status['Value'] }}">{{ $status['Text'] }}</option>
+            @endforeach
+        </select>
     </div>
 </div>
 <div class="mt-3">
     <button class="btn btn-primary" onclick="handleSearch()">Filter</button>
 </div>
-
+<div class="container mt-4">
+    <div class="d-flex justify-content-end">
+        <button class="btn btn-primary" onclick="handleAdd()">
+            <i class="fas fa-plus-circle"></i> Tambah Kelompok Keahlian
+        </button>
+    </div>
+</div>
 <!-- Container -->
 <div class="container" style="margin-top: 50px;">
     <!-- Data Aktif -->

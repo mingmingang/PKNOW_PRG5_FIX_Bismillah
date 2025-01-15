@@ -18,7 +18,7 @@ class KKController extends Controller
     
     public function index()
     {
-        $roles = session('roles');
+        $role = Cookie::get('role');
         $dataFilterSort = [
             ['Value' => '[Nama Kelompok Keahlian] asc', 'Text' => 'Nama Kelompok Keahlian [↑]'],
             ['Value' => '[Nama Kelompok Keahlian] desc', 'Text' => 'Nama Kelompok Keahlian [↓]'],
@@ -32,16 +32,13 @@ class KKController extends Controller
             ['Value' => 'Tidak Aktif', 'Text' => 'Tidak Aktif'],
         ];
 
-        return view('page.master-pic-pknow.KelolaKK.KelolaKK', compact('dataFilterSort', 'dataFilterStatus', 'roles'));
+        return view('page.master-pic-pknow.KelolaKK.KelolaKK', compact('dataFilterSort', 'dataFilterStatus', 'role'));
     }
 
     
-    public function getTempDataKK(Request $request, $role)
+    public function getTempDataKK(Request $request)
     {
-        // Debugging untuk memastikan parameter diterima
-        error_log('Role: ' . $role);
-        error_log('Request Params: ' . print_r($request->all(), true));
-    
+   
         $params = [
             $request->input('page', 1), // @p1
             $request->input('query', '') !== null ? $request->input('query', '') : '', // @p2
@@ -98,8 +95,9 @@ class KKController extends Controller
     
     public function create(Request $request)
     {
-        $roles = session('roles');
-    
+        $role = Cookie::get('role');
+  
+        error_log('rolesss'.$role);
         // Fetch list of Prodi
         $listProdi = DB::select('EXEC pknow_getListProdi ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?', 
             array_fill(0, 50, null));
@@ -126,7 +124,7 @@ class KKController extends Controller
             })->values(); // Reset indeks array
         }
     
-        return view('page.master-pic-pknow.KelolaKK.TambahKK', compact('listProdi', 'listKaryawan', 'roles'));
+        return view('page.master-pic-pknow.KelolaKK.TambahKK', compact('listProdi', 'listKaryawan', 'role'));
     }
     
 
@@ -193,10 +191,8 @@ class KKController extends Controller
             ]);
     
             if (!empty($result) && $result[0]->hasil === 'OK') {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Kelompok Keahlian berhasil ditambahkan.',
-                ]);
+                return redirect()->route('kelola_kk', ['role' => $role])
+                    ->with('success', 'Kelompok Keahlian berhasil ditambahkan.');
             } else {
                 throw new \Exception('Terjadi kesalahan saat menyimpan data.');
             }

@@ -50,7 +50,7 @@
         </a>
         <ul class="dropdown-content">
         <li>
-            <a href="#sub1">
+            <a onclick="handleKelolaProgram()">
             <i class="fas fa-graduation-cap"></i>
               <span>Kelola Program</span>
             </a>
@@ -113,16 +113,16 @@
     </nav>
 </body>
 <script>
-function handleKelolaKK() {
-        window.location.href = `/kelola_kk`;
-}
 
 function handleBeranda() {
   const role = "{{ Cookie::get('role') }}";
         window.location.href = `/dashboard/${role}`;
 }
 
-
+function handleKelolaProgram() {
+  const role = "{{ Cookie::get('role') }}";
+        window.location.href = `/kelola_program/${role}`;
+}
 
   function showDropdown() {
   document.querySelector('.profile-dropdown').style.display = 'block';
