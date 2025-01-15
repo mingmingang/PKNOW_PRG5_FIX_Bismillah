@@ -34,13 +34,13 @@
         </a>
         <ul class="dropdown-content">
           <li>
-            <a onclick="handleKelolaKK()">
+            <a onclick="handlePengajuanKK()">
             <i class="fas fa-cogs"></i>
               <span>Pengajuan Kelompok Keahlian</span>
             </a>
           </li>
           <li>
-            <a href="#sub2">
+          <a onclick="handleRiwayatPengajuan()">
             <i class="fas fa-users"></i>
               <span>Riwayat Pengajuan</span>
             </a>
@@ -130,17 +130,19 @@
     </div>
   </div>
 </div>
-
+ 
 </div>
     </nav>
 </body>
 <script>
-  function handleKelolaKK(){
-    const urlParams = new URLSearchParams(window.location.search);
-    const role = urlParams.get('role');
-    const name = urlParams.get('pengguna');
-    window.location.href = `/kelola_kk/${role}?role=${encodeURIComponent(role)}&pengguna=${encodeURIComponent(name)}`;
-  }
+  function handlePengajuanKK() {
+  const role = "{{ Cookie::get('role') }}";
+        window.location.href = `/pengajuan_kk/${role}`;
+}
+  function handleRiwayatPengajuan() {
+  const role = "{{ Cookie::get('role') }}";
+        window.location.href = `/riwayat_pengajuan/${role}`;
+}
   function showDropdown() {
   document.querySelector('.profile-dropdown').style.display = 'block';
 }

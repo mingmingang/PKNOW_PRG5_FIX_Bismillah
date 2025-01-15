@@ -55,12 +55,12 @@
           </div>
         </a>
         <ul class="dropdown-content">
-          <li>
-            <a href="#sub1">
-            <i class="fas fa-book"></i>
-              <span>Daftar Pustaka</span>
-            </a>
-          </li>
+        <li>
+                <a onclick="handleDaftarPustaka()">
+                  <i class="fas fa-book"></i>
+                  <span>Daftar Pustaka</span>
+                </a>
+   </li>
         </ul>
       </li>
       <li class="menu-item">
@@ -146,6 +146,12 @@ function handleKelolaAKK() {
     return;
   }
   window.location.href = `/kelola_akk/${role}`;
+}
+
+
+function handleDaftarPustaka() {
+    const role = "{{ Cookie::get('role') }}";
+    window.location.href = `/daftar_pustaka/${role}`;
 }
 
 

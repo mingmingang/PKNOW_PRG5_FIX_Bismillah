@@ -8,7 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ asset('css/Search.css') }}">
     <link rel="stylesheet" href="{{ asset('css/index.css') }}">
-    <title>pp</title>
+    <title>Pengajuan Anggota Keahlian</title>
 </head>
 @include('backbone.headertenagapendidik', [
     'showMenu' => false, // Menyembunyikan menu pada halaman login
@@ -19,126 +19,122 @@
     'kelolaProgram' => false,
     'showConfirmation' => false, // Pastikan variabel ini ada untuk header
 ])
+
 <div class="app-container">
     <div class="backSearch">
-        <h1>Persetujuan Anggota Keahlian</h1>
-        <p>Program Studi dapat menyetujui persetujuan pengajuan anggota keahlian yang diajukan oleh Tenaga Pendidik
-            untuk menjadi anggota dalam Kelompok Keahlian. Program Studi dapat melihat lampiran pengajuan dari Tenaga
-            Pendidik untuk menjadi bahan pertimbangan</p>
+        <h1>Riwayat Anggota Keahlian</h1>
+        <p>Riwayat Pengajuan akan menampilkan pengajuan anggota keahlia yang anda ajukan, hanya terdapat satu kelompok keahlian yang pengajuannya akan diterima oleh Program Studi.</p>
+        <div class="input-wrapper">
+            <button style="border: none; background: transparent;">
+                <i class="fas fa-search search-icon"></i>
+            </button>
+            <input type="text" class="search" placeholder="Cari?" />
+        </div>
     </div>
     <div class="navigasi-layout-page">
-        <p class="title-kk">Kelompok Keahlian</p>
-        <div class="left-feature">
-            <div class="status">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <i class="fas fa-circle" style="color: #4a90e2;"></i>
-                            </td>
-                            <td>
-                                <p>Aktif/Sudah Publikasi</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <i class="fas fa-circle" style="color: #FFC619;"></i>
-                            </td>
-                            <td>
-                                <p>Menunggu Persetujuan</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+    <p class="title-kk">Kelompok Keahlian</p>
+    <div class="left-feature">
+        <div class="status">
+            <table>
+                <tbody>
+                    <tr>
+                        <td><i class="fas fa-circle" style="color: grey;"></i></td>
+                        <td><p>Dibatalkan</p></td>
+                    </tr>
+                    <tr>
+                        <td><i class="fas fa-circle" style="color: rgb(220, 53, 69);"></i></td>
+                        <td><p>Ditolak</p></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="tes" style="display: flex;">
+            <div>
+                <button type="button" 
+                        class="btn btn- px-3 custom-add py-2 add-button fw-semibold rounded-4" 
+                        
+                        title="Saring atau Urutkan Data" 
+                        style="background-color: white; color: black; box-shadow: rgba(0, 0, 0, 0.224) 0px 0px 10px;">
+                    <i class="fi fi-br-apps-sort pe-2" style="margin-top: 5px;"></i>Filter
+                </button>
+                
             </div>
         </div>
     </div>
+</div>
 
- 
+
+
 </div>
 
 <!-- Data Table -->
-<div id="dataContainer" class="row" style="margin-left: 68px; margin-right: 68px;"></div>
+<div class="card-body ml-5 mr-5 ">
+    <!-- Pagination -->
+    <div id="pagination" class="d-flex justify-content-center mt-4"></div>
 
+
+    <div id="datacontainerKKLainnya" class="row" ></div>
+
+</div>
+</div>
 
 <script>
+    // Data kelompok keahlian diambil dari PHP
     var data = @json($data);
-    const container = document.getElementById('dataContainer');
-    container.innerHTML = '';
-    console.log("data kk", data);
-    if (data.length === 0) {
-        container.innerHTML = '<p class="text-center">Tidak ada data!</p>';
+    console.log("chio", data);
+
+    const containerKKLainnya = document.getElementById('datacontainerKKLainnya');
+
+
+
+    containerKKLainnya.innerHTML = '';
+    // Filter data untuk hanya menampilkan status Ditolak dan Dibatalkan
+    const filteredData = data.filter(item => item.Status === 'Ditolak' || item.Status === 'Dibatalkan');
+
+    if (filteredData.length === 0) {
+        containerKKLainnya.innerHTML =
+            '<p class="text-center">Tidak ada data dengan status Ditolak atau Dibatalkan!</p>';
     } else {
-        data.forEach(item => {
-            container.innerHTML += `
-                <div class="col-lg-4 mb-3">
-                    <div class="card p-0" 
-                                         style="border-radius: 10px; border-color: '#67ACE9'>
-                        
-<div class="card-body p-0">
+        filteredData.forEach(item => {
+            let cardTemplate = `
+            <div class="col-md-4 mb-4" style="margin-top: -40px;">
+                <div class="card">
+                    <img src="${item.Gambar ? '/' + item.Gambar : ''}" class="card-img-top" alt="${item['Nama Kelompok Keahlian']}">
+                    <div class="card-body">
+                        <h3 class="mb-3 fw-semibold" style="color: rgb(10, 94, 168);">${item['Nama Kelompok Keahlian']}</h3>
+                        <h5 class="fw-semibold">
+                            Status: ${item.Status}
+                        </h5>
+                        <h5 class="fw-semibold">
+                            <i class="fas fa-graduation-cap" style="font-size: 20px; color: black;"></i>
+                            ${item.Prodi}
+                        </h5>
+                        <p class="card-text">${item.Deskripsi}</p>
+        `;
 
-  <img src="${item.Gambar ? '/' + item.Gambar : ''}" alt="${item['Nama Kelompok Keahlian']} style="width: 390px; height: 180px; object-fit: cover; margin: 10px; border-radius: 10px;"">
-        
-            <h5 
-                class="card-title px-3 pt-2 pb-3" 
-                style="color: #0A5EA8; font-weight: bold; margin-bottom: 0;"
-            >
-               ${item['Nama Kelompok Keahlian']}
-            </h5>
-
-            
-            <div class="card-body p-3" style="margin-top: -20px;">
-                <div>
-                    <i class="fas fa-users btn px-0 pb-1 text-primary" title="Anggota Kelompok Keahlian"></i>
-                    <span>
-                     
-                              <a href="#" class="fw-semibold text-dark text-decoration-none">
-                            ${item.AnggotaAktif} Anggota Aktif
-                        </a>
-                    </span>
-                </div>
-                <div>
-                    <i class="fas fa-clock btn px-0 pb-1 text-primary" title="Menunggu Persetujuan"></i>
-                    <span>
-                        <a href="#" class="fw-semibold text-dark text-decoration-none">
-                            ${item.MenungguAcc} Menunggu Persetujuan
-                        </a>
-                    </span>
-                </div>
-                <p 
-                    class="lh-sm mt-2" 
-                >
-                    ${item.Deskripsi}
-                </p>
-                <div class="d-flex justify-content-between align-items-center">
-                      
-                    <button 
-                        class="btn btn-primary btn-sm"
-                        title="Lihat detail Persetujuan Anggota Keahlian"
-                        onclick="detailPersetujuan('${item.Key}')"
-                    >
-                        <i class="fas fa-user"></i> Lihat Semua
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-                       
+            // Tambahkan tombol Riwayat untuk Ditolak atau Dibatalkan
+            cardTemplate += `
+            <div class="d-flex justify-content-between">
+                        <button class="btn btn-secondary" onclick="detail('${item.Key}')"><i class="fas fa-history"></i> Riwayat</button>
                     </div>
-                </div>
-            `;
+           
+        `;
+
+            cardTemplate += `</div></div></div>`;
+
+            // Masukkan ke dalam container
+            containerKKLainnya.innerHTML += cardTemplate;
         });
     }
 </script>
 
-<script>
-    function detailPersetujuan(id) {
-        const role = "{{ Cookie::get('role') }}"; // Ambil role dari cookie
-        console.log("Navigating to detail page for ID:", id);
-        window.location.href = `/persetujuan/${role}/detailPersetujuan/${id}`;
-    }
 
+<script>
+    function detail(akk_id) {
+        const role = "{{ Cookie::get('role') }}"; // Ambil role dari cookie
+        console.log("Navigating to detail page for ID:", akk_id);
+        window.location.href = `/riwayat_pengajuan/${role}/detail/${akk_id}`;
+    }
 
     function toggleStatus(id, currentStatus, personInCharge) {
         const newStatus = currentStatus === 'Aktif' ? 'Tidak Aktif' : 'Aktif';
@@ -187,7 +183,7 @@
 
 
 <script>
-    const apiLink = "{{ route('persetujuan') }}";
+    const apiLink = "{{ route('riwayat_pengajuan') }}";
     console.log(apiLink);
     var data = @json($data);
     console.log("ayamansdf");
